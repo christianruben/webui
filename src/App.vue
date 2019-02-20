@@ -19,7 +19,8 @@
           <v-list-tile
             v-for="(item, i) in menuItems"
             :key="i"
-            @click="pass"
+            ripple
+            @click="optionClick"
           >
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile>
@@ -89,7 +90,9 @@ export default {
       drawer: null,
       items: [
         { title: 'Home', icon: 'dashboard', routename: 'news' },
-        { title: 'About', icon: 'question_answer', routename: '/' }
+        { title: 'About', icon: 'question_answer', routename: '/' },
+        { title: 'Jadwal', icon: 'schedule', routename: 'schedule'},
+        { title: 'Nilai', icon: 'edit', routename: 'nilai'}
       ],
       menuItems: [
         { title: 'Settings' },
@@ -113,6 +116,9 @@ export default {
   methods: {
     pushRoute(name){
       this.$router.push(name);
+    },
+    optionClick(){
+
     }
   },
 }

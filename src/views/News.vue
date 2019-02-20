@@ -1,10 +1,6 @@
 <template>
   <v-container>
-    <v-layout
-      text-xs-center
-      wrap
-    >
-    <v-list>
+    <v-list three-line>
       <template v-for="(item, index) in items">
         <v-subheader
           v-if="item.header"
@@ -22,7 +18,6 @@
         ></v-divider>
       </template>
     </v-list>
-    </v-layout>
   </v-container>
 </template>
 
@@ -35,7 +30,7 @@
     data () {
       return {
         items: [
-          { header: 'Today' },
+          { header: 'News' },
           {
             avatar: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
             title: 'Brunch this weekend?',
