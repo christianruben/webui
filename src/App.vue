@@ -91,7 +91,7 @@ export default {
       items: [
         { title: 'Home', icon: 'dashboard', routename: 'news' },
         { title: 'About', icon: 'question_answer', routename: '/' },
-        { title: 'Jadwal', icon: 'schedule', routename: 'schedule'},
+        { title: 'Jadwal', icon: 'schedule', routename: 'teacher'},
         { title: 'Nilai', icon: 'edit', routename: 'nilai'}
       ],
       menuItems: [
