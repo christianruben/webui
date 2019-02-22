@@ -28,7 +28,9 @@
       </v-menu>
     </v-toolbar>
     <v-content>
+      <transition name="slide">
         <router-view></router-view>
+      </transition>
     </v-content>
     <v-navigation-drawer
       v-model="drawer"
@@ -73,6 +75,7 @@
           </v-btn>
           <v-toolbar-title>Profile</v-toolbar-title>
         </v-toolbar>
+        <Profile/>
       </v-card>
     </v-dialog>
     <!-- modal -->
@@ -80,7 +83,12 @@
 </template>
 
 <script>
+import Profile from './components/Profile'
+
 export default {
+  components: {
+    Profile
+  },
   name: 'App',
   data () {
     return {

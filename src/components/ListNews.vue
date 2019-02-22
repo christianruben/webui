@@ -3,7 +3,7 @@
         :key="item.id"
         avatar
         ripple
-        @click="loadNews"
+        @click="loadNews(item.id)"
         >
         <v-list-tile-content>
             <v-list-tile-title v-html="item.title"></v-list-tile-title>
@@ -21,8 +21,8 @@ export default {
         item: Object
     },
     methods: {
-        loadNews(){
-
+        loadNews(id){
+            this.$router.push({name: "newspost", params: {id: id}})
         }
     },
 }
