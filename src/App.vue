@@ -1,6 +1,6 @@
 <template>
   <v-app>
-    <v-toolbar v-if="isLogged"
+    <v-toolbar v-if="auth"
       fixed
       app>
       <v-toolbar-side-icon v-if="!drawer" @click="drawer = !drawer"></v-toolbar-side-icon>
@@ -33,6 +33,7 @@
       </transition>
     </v-content>
     <v-navigation-drawer
+      v-if="auth"
       v-model="drawer"
       app
     >
@@ -129,5 +130,13 @@ export default {
 
     }
   },
+  computed: {
+    auth(){
+      return this.$store.getters['authentication/isUserLogged']
+    }
+  },
+  beforeCreate(){
+    this.$store.dispatch('header/switchOn')
+  }
 }
 </script>

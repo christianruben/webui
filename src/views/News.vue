@@ -10,7 +10,7 @@
         </v-subheader>
         <ListNews 
           v-else
-          :key="item.title"
+          :key="item.id"
           :item="item"/>
         <v-divider
           v-if="index + 1 < items.length"
@@ -86,13 +86,6 @@
             title: 'Birthday gift',
             subtitle: "<span class='text--primary'>Trevor Hansen</span> &mdash; Have any ideas about what we should get Heidi for her birthday?",
             timestample: "3 hours"
-          },
-          {
-            id: 9,
-            avatar: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
-            title: 'Recipe to try',
-            subtitle: "<span class='text--primary'>Britta Holt</span> &mdash; We should eat this: Grate, Squash, Corn, and tomatillo Tacos.",
-            timestample: "4 hours"
           }
         ]
       }
