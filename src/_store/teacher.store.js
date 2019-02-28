@@ -1,4 +1,4 @@
-export const Class = {
+export const store = {
     namespace: true,
     state: {
         listItems: []

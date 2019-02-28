@@ -1,8 +1,22 @@
-export const news = {
+export const header = {
     namespaced: true,
     state: {
-        
+        show: null
     },
-    actions: {},
-    mutations: {}
+    actions: {
+        switchOn({commit}){
+            commit('switchOn')
+        },
+        switchOff({commit}){
+            commit('switchOff')
+        }
+    },
+    mutations: {
+        switchOn(state){  
+            state.show = true
+        },
+        switchOff(state){
+            state.show = false
+        }
+    }
 }
