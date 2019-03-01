@@ -33,20 +33,25 @@ const router = new Router({
       path: '/news/p/:id',
       name: 'newspost',
       component: () => import(/* webpackChunkName: "newspost" */ './views/Post.vue')
+    },
+    {
+      path: '/schedule',
+      name: 'schedule',
+      component: () => import(/* webpackChunkName: "schedule" */ './views/Jadwal.vue')
     }
   ]
 })
 
-router.beforeEach((to, from, next) => {
-  // const publicPages = ['/login'];
-  // const authRequired = !publicPages.includes(to.path);
-  // const isLogged = localStorage.getItem("user");
+// router.beforeEach((to, from, next) => {
+//   // const publicPages = ['/login'];
+//   // const authRequired = !publicPages.includes(to.path);
+//   // const isLogged = localStorage.getItem("user");
 
-  // if(authRequired && !isLogged){
-  //   return next('/login');
-  // }
+//   // if(authRequired && !isLogged){
+//   //   return next('/login');
+//   // }
 
-  next();
-})
+//   next();
+// })
 
 export default router
