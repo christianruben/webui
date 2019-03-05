@@ -53,7 +53,7 @@
         <v-divider></v-divider>
         <v-list-group
           prepend-icon="account_circle"
-          value="true"
+          value="false"
         >
           <v-list-tile slot="activator">
             <v-list-tile-title>Data Master</v-list-tile-title>
