@@ -51,9 +51,28 @@
 
       <v-list class="pt-0" dense>
         <v-divider></v-divider>
-
+        <v-list-group
+          prepend-icon="account_circle"
+          value="true"
+        >
+          <v-list-tile slot="activator">
+            <v-list-tile-title>Data Master</v-list-tile-title>
+          </v-list-tile>
+            <v-list-tile
+              v-for="master in dataMaster"
+              :key="master.title"
+              @click="pushRoute(master.title)"
+            >
+              <v-list-tile-action>
+                <v-icon>{{ master.icon }}</v-icon>
+              </v-list-tile-action>
+              <v-list-tile-content>
+                <v-list-tile-title>{{ master.title }}</v-list-tile-title>
+              </v-list-tile-content>
+            </v-list-tile>
+        </v-list-group>
         <v-list-tile
-          v-for="item in items"
+          v-for="item in list"
           :key="item.title"
           @click="pushRoute(item.routename)"
         >
@@ -98,10 +117,24 @@ export default {
       isLogged: true,
       drawer: null,
       items: [
-        { title: 'Home', icon: 'dashboard', routename: 'news' },
-        { title: 'About', icon: 'question_answer', routename: '/' },
+        { title: 'Home', icon: 'dashboard', routename: 'news'},
+        { title: 'About', icon: 'question_answer', routename: '/'},
         { title: 'Jadwal', icon: 'schedule', routename: 'teacher'},
         { title: 'Nilai', icon: 'edit', routename: 'nilai'}
+      ],
+      itemsAdmin: [
+        { title: 'Home', icon: 'dashboard', routename: 'news'},
+      ],
+      dataMaster: [
+        { title: 'Siswa', icon: 'people'},
+        { title: 'Guru', icon: 'people'},
+        { title: 'Pelajaran', icon: 'book'},
+        { title: 'Jadwal', icon: 'assignment'},
+        { title: 'Kelas', icon: 'room'},
+        { title: 'Berita', icon: 'description'},
+        { title: 'User', icon: 'person'},
+        { title: 'Semester', icon: 'list'},
+        { title: 'Hari', icon: 'event'}
       ],
       menuItems: [
         { title: 'Settings' },
