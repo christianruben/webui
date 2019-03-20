@@ -39,7 +39,7 @@ export const studies = {
         deleteItems(state, {id}){
             state.listItems.find((item, index)=>{
                 if(item.id === id){
-                    delete stat.listItems[index]
+                    delete state.listItems[index]
                 }
             })
         }

@@ -16,7 +16,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="sub" :loading="loadaction" :disabled="loadaction">Login</v-btn>
+                <v-btn color="primary" @click="submitLogin" :loading="isLoading" :disabled="isLoading">Login</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -51,6 +51,18 @@
                         this.$router.push('/about')
                     }, 3000);
                 }
+            },
+            submitLogin(){
+                const {username, password} = this;
+                const {dispatch} = this.$store;
+                if(this.$refs.form.validate()){
+                    dispatch('authentication/logIn', {username, password})
+                }
+            }
+        },
+        computed: {
+            isLoading(){
+                return this.$store.state.authentication.loading;
             }
         },
     }

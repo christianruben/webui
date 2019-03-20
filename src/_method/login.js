@@ -1,13 +1,20 @@
 const config = require('./config');
 
 function authentication(username, password, callback){
-    fetch(`${config.auth}/login`, config.config).then(res=>{
+    let result = {
+        json: null,
+        err: null
+    }
+    let conf = config.url.postconfig.body = {username: username, password: password}
+    fetch(`${config.url.auth}/login`, config.url.postconfig).then(res=>{
         // fetch body response to json
         return res.json();
     }).then(json=>{
-        callback(json, null);
+        result.json = json;
+        callback(result);
     }).catch(err=>{
-        callback(null, err);
+        result.err = err;
+        callback(result);
     });
 }
 
