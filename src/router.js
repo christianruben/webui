@@ -42,6 +42,7 @@ const router = new Router({
   ]
 })
 
+<<<<<<< HEAD
 // router.beforeEach((to, from, next) => {
 //   // const publicPages = ['/login'];
 //   // const authRequired = !publicPages.includes(to.path);
@@ -50,6 +51,16 @@ const router = new Router({
 //   // if(authRequired && !isLogged){
 //   //   return next('/login');
 //   // }
+=======
+router.beforeEach((to, from, next) => {
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+  const isLogged = localStorage.getItem("user");
+
+  if(authRequired && !isLogged){
+    return next('/login');
+  }
+>>>>>>> c167a16cd99e17ee360cf5e9f1bfe6710992cd9e
 
 //   next();
 // })

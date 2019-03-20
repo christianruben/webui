@@ -166,9 +166,6 @@ export default {
   computed: {
     auth(){
       return this.$store.getters['authentication/isUserLogged']
-    },
-    list(){
-      return this.$store.getters['authentication/getLevel'] === 1 ? this.itemsAdmin : this.items
     }
   },
   beforeCreate(){
