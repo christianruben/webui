@@ -5,9 +5,18 @@
           <v-flex xs12 sm8 md4>
             <v-card class="elevation-6">
               <v-toolbar dark color="primary">
-                <v-toolbar-title>Login form</v-toolbar-title>
+                <v-toolbar-title>{{getType.title}}</v-toolbar-title>
                 <v-spacer></v-spacer>
               </v-toolbar>
+                <v-alert
+                    :value="errMessage && (username != '' && password != '')"
+                    color="error"
+                    icon="warning"
+                    outline
+                    transition="fade-transition"
+                >
+                    {{errMessage}}
+                </v-alert>
               <v-card-text>
                 <v-form v-model="valid" ref="form">
                   <v-text-field prepend-icon="person" name="login" label="Login" type="text" v-model="username" :rules="userRules" required></v-text-field>
@@ -16,7 +25,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="submitLogin" :loading="isLoading" :disabled="isLoading">Login</v-btn>
+                <v-btn color="primary" @click="sub" :loading="isLoading" :disabled="isLoading">Login</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>
@@ -48,7 +57,13 @@
                     this.loadaction = true;
                     setTimeout(() => {
                         (this.loadaction = false)
-                        this.$router.push('/about')
+                        if(this.getType.type === 1){
+                            this.$store.dispatch('authentication/fakeloginadm')
+                        this.$router.push('/admin')
+                        }else{
+                            this.$store.dispatch('authentication/fakelogin')
+                        this.$router.push('/')
+                        }
                     }, 3000);
                 }
             },
@@ -56,13 +71,33 @@
                 const {username, password} = this;
                 const {dispatch} = this.$store;
                 if(this.$refs.form.validate()){
-                    dispatch('authentication/logIn', {username, password})
+                    if(this.getType.type === 1){
+                        dispatch('authentication/adminLogIn', {username, password})
+                    }else{
+                        dispatch('authentication/logIn', {username, password})
+                    }
                 }
             }
         },
         computed: {
             isLoading(){
                 return this.$store.state.authentication.loading;
+            },
+            errMessage(){
+                return this.$store.state.authentication.errmsg;
+            },
+            getType(){
+                if(this.$route.path.split('/')[1] === 'admin'){
+                    return {
+                        title: 'Admin Login',
+                        type: 1
+                    }
+                }else{
+                    return {
+                        title: 'User Login',
+                        type: 2
+                    }
+                }
             }
         },
     }

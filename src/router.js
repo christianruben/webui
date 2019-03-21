@@ -5,6 +5,7 @@ import Home from './views/Home.vue'
 Vue.use(Router)
 
 const router = new Router({
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -38,30 +39,39 @@ const router = new Router({
       path: '/schedule',
       name: 'schedule',
       component: () => import(/* webpackChunkName: "schedule" */ './views/Jadwal.vue')
+    },
+    {
+      path: '/admin/login',
+      name: 'adminlogin',
+      component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
     }
   ]
 })
 
-// <<<<<<< HEAD
-// // router.beforeEach((to, from, next) => {
-// //   // const publicPages = ['/login'];
-// //   // const authRequired = !publicPages.includes(to.path);
-// //   // const isLogged = localStorage.getItem("user");
-
-// //   // if(authRequired && !isLogged){
-// //   //   return next('/login');
-// //   // }
-// =======
 router.beforeEach((to, from, next) => {
-  // const publicPages = ['/login'];
-  // const authRequired = !publicPages.includes(to.path);
-  // const isLogged = localStorage.getItem("user");
+  const publicPages = ['/login'];
+  const authRequired = !publicPages.includes(to.path);
+  const isLogged = localStorage.getItem("user");
+  const adminpublicPages = ['/admin/login'];
+  const authRequiredAdmin = !adminpublicPages.includes(to.path);
 
-  // if(authRequired && !isLogged){
-  //   return next('/login');
-  // }
-// >>>>>>> c167a16cd99e17ee360cf5e9f1bfe6710992cd9e
-
+  const arrfirst = to.path.split('/')[1];
+  // return to /login if user is not logged
+  if(arrfirst !== 'admin' && authRequired && !isLogged){
+    return next('/login');
+  }
+  // return to /admin/login if admin not logged
+  if(arrfirst === 'admin' && authRequiredAdmin && !isLogged){
+    return next('/admin/login');
+  }
+  // return to home if user has logged and try access to login path
+  if(arrfirst !== 'admin' && !authRequired && isLogged){
+    return next('/');
+  }
+  // return to home if admin has logged and try access to login path
+  if(arrfirst === 'admin' && !authRequiredAdmin && isLogged){
+    return ('/admin');
+  }
   next();
 })
 

@@ -1,4 +1,4 @@
-const config = require('./config');
+import {config} from './config';
 
 function list(index, rows, search, callback){
     let result = {

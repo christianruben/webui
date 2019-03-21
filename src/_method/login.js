@@ -1,12 +1,11 @@
-const config = require('./config');
+import { config } from './config';
 
 function authentication(username, password, callback){
     let result = {
         json: null,
         err: null
     }
-    let conf = config.url.postconfig.body = {username: username, password: password}
-    fetch(`${config.url.auth}/login`, config.url.postconfig).then(res=>{
+    fetch(`${config.auth}/login`, config.postdataconfig({username: username, password: password})).then(res=>{
         // fetch body response to json
         return res.json();
     }).then(json=>{
@@ -18,6 +17,6 @@ function authentication(username, password, callback){
     });
 }
 
-module.exports = {
+export const login = {
     authentication
 }

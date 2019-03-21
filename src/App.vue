@@ -20,7 +20,7 @@
             v-for="(item, i) in menuItems"
             :key="i"
             ripple
-            @click="optionClick"
+            @click="optionClick(item.id)"
           >
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile>
@@ -49,7 +49,7 @@
         </v-list-tile>
       </v-list>
 
-      <v-list class="pt-0" dense>
+      <v-list v-if="getLevel == 2" class="pt-0" dense>
         <v-divider></v-divider>
         <v-list-group
           prepend-icon="account_circle"
@@ -61,7 +61,7 @@
             <v-list-tile
               v-for="master in dataMaster"
               :key="master.title"
-              @click="pushRoute(master.title)"
+              @click="pushRoute(master.path)"
             >
               <v-list-tile-action>
                 <v-icon>{{ master.icon }}</v-icon>
@@ -126,19 +126,19 @@ export default {
         { title: 'Home', icon: 'dashboard', routename: 'news'},
       ],
       dataMaster: [
-        { title: 'Siswa', icon: 'people'},
-        { title: 'Guru', icon: 'people'},
-        { title: 'Pelajaran', icon: 'book'},
-        { title: 'Jadwal', icon: 'assignment'},
-        { title: 'Kelas', icon: 'room'},
-        { title: 'Berita', icon: 'description'},
-        { title: 'User', icon: 'person'},
-        { title: 'Semester', icon: 'list'},
-        { title: 'Hari', icon: 'event'}
+        { title: 'Siswa', icon: 'people', path: '/admin/siswa'},
+        { title: 'Guru', icon: 'people', path: '/admin/guru'},
+        { title: 'Pelajaran', icon: 'book', path: '/admin/pelajaran'},
+        { title: 'Jadwal', icon: 'assignment', path: '/admin/jadwal'},
+        { title: 'Kelas', icon: 'room', path: '/admin/kelas'},
+        { title: 'Berita', icon: 'description', path: '/admin/berita'},
+        { title: 'User', icon: 'person', path: '/admin/user'},
+        { title: 'Semester', icon: 'list', path: '/admin/semester'},
+        { title: 'Hari', icon: 'event', path: '/admin/hari'}
       ],
       menuItems: [
-        { title: 'Settings' },
-        { title: 'Logout' },
+        { title: 'Settings', id: 1 },
+        { title: 'Logout', id: 2 },
       ],
       drawers: {
       // sets the open status of the drawer
@@ -159,13 +159,18 @@ export default {
     pushRoute(name){
       this.$router.push(name);
     },
-    optionClick(){
-
+    optionClick(id){
+      if(id === 2){
+        this.$store.dispatch('authentication/logOut')
+      }
     }
   },
   computed: {
     auth(){
       return this.$store.getters['authentication/isUserLogged']
+    },
+    getLevel(){
+      return this.$store.state.authentication.level
     }
   },
   beforeCreate(){

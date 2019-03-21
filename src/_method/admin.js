@@ -1,4 +1,4 @@
-const config = require('./config');
+import {config} from './config';
 
 function login(username, password, callback){
     let result = {
@@ -32,7 +32,7 @@ function list(index, rows, callback){
     });
 }
 
-module.exports = {
+export const admin = {
     login,
     list
 }
