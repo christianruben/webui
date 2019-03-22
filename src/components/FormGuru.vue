@@ -5,6 +5,20 @@
                 <v-card-title>
                     <span class="headline"></span>
                 </v-card-title>
+                <form>
+                    <v-text-field
+                    :counter="10"
+                    label="Name"
+                    required
+                    ></v-text-field>
+                    <v-text-field
+                    label="E-mail"
+                    required
+                    ></v-text-field>
+
+                    <v-btn @click="submit">submit</v-btn>
+                    <v-btn @click="clear">clear</v-btn>
+                </form>
             </v-card>
         </v-dialog>
     </v-layout>
@@ -13,8 +27,24 @@
 <script>
 export default {
     props: {
-        condition: Boolean,
-        
-    }
+        dialog: Boolean,
+    },
+    data() {
+        return {
+            nip: "",
+            name: "",
+            gender: "",
+            religion: "",
+            bornplace: "",
+            borndate: "",
+            address: "",
+            phonenumber: "",
+            relationship: "",
+            nipRules: [
+                (v) => !!v || "nip is required",
+                (v) => v && v.length > 6 || "Nip must more than 6 number"
+            ],
+        }
+    },
 }
 </script>

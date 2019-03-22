@@ -1,7 +1,7 @@
 const user = localStorage.getItem("user")
 const level = localStorage.getItem("level")
 import {login} from '../_method'
-import router from '../router';
+import router from '../router'
 
 const initState = user ? {isLogged: true, user: user, loading: false, errmsg: null, level: level} : {isLogged: false, user: user, loading: false, errmsg: null, level: null}
 
