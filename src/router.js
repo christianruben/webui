@@ -41,9 +41,20 @@ const router = new Router({
       component: () => import(/* webpackChunkName: "schedule" */ './views/Jadwal.vue')
     },
     {
+      path: '/admin',
+      name: 'admin',
+      component: () => import(/* webpackChunkName: "admin" */ './views/admin/Home.vue')
+    }
+    ,
+    {
       path: '/admin/login',
       name: 'adminlogin',
       component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
+    },
+    {
+      path: '/admin/guru',
+      name: 'adminguru',
+      component: () => import(/* webpackChunkName: "guru" */'./views/admin/Guru.vue')
     }
   ]
 })
@@ -52,6 +63,7 @@ router.beforeEach((to, from, next) => {
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
   const isLogged = localStorage.getItem("user");
+  const level = localStorage.getItem("level")
   const adminpublicPages = ['/admin/login'];
   const authRequiredAdmin = !adminpublicPages.includes(to.path);
 
@@ -70,7 +82,11 @@ router.beforeEach((to, from, next) => {
   }
   // return to home if admin has logged and try access to login path
   if(arrfirst === 'admin' && !authRequiredAdmin && isLogged){
-    return ('/admin');
+    return next('/admin');
+  }
+
+  if((arrfirst !== 'admin') && isLogged && level == 2){
+    return next('/admin')
   }
   next();
 })

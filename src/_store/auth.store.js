@@ -28,9 +28,9 @@ export const authentication = {
                 const {json, err} = result;
                 if(!err){
                     if(json.auth){
-                        commit('saveUser', json.token)
+                        commit('saveUser',{user: json.token, level: 1})
                         commit('setLogin')
-                        router.push('/');
+                        router.replace('/');
                     }else{
                         commit('setErrMsg', json.message)
                         setTimeout(()=>{
@@ -44,13 +44,13 @@ export const authentication = {
         adminLogIn({commit}, {username, password}){
             commit('setLoading', true)
             commit('setErrMsg', null)
-            login.authentication(username, password, (result)=>{
+            login.authenticationAdmin(username, password, (result)=>{
                 const {json, err} = result;
                 if(!err){
                     if(json.auth){
-                        commit('saveUser', json.token)
+                        commit('saveUser',{user: json.token, level: 2})
                         commit('setLogin')
-                        router.push('/admin')
+                        router.replace('/admin')
                     }else{
                         commit('setErrMsg', json.message)
                         setTimeout(()=>{
@@ -61,9 +61,26 @@ export const authentication = {
                 commit('setLoading', false)
             });
         },
+        checkLogin({commit}){
+            login.checkup(result=>{
+                const {json, err} = result;
+                if(!err){
+                    if(!json.auth){
+                        commit('setLogout')
+                    }
+                }else{
+                    commit('setLogout')
+                }
+            })
+        },
         logOut({commit}){
+            let lvl = level
             commit('setLogout')
-            router.replace('/login')
+            if(lvl == 2){
+                router.replace('/admin/login')
+            }else{
+                router.replace('/login')
+            }
         },
         refreshToken({commit}, user){
             commit('saveUser', user)
@@ -84,6 +101,8 @@ export const authentication = {
         saveUser(state, {user, level}){
             state.user = user
             state.level = level
+            localStorage.setItem("user", user)
+            localStorage.setItem("level", level)
         },
         setLogin(state){
             state.isLogged = true

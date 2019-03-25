@@ -1,15 +1,56 @@
 import { config } from './config';
 
-function authentication(username, password, callback){
+async function authentication(username, password, callback){
     let result = {
         json: null,
         err: null
     }
-    fetch(`${config.auth}/login`, config.postdataconfig({username: username, password: password})).then(res=>{
+    let reqconf = config.postdataconfig({username: username, password: password})
+    try{
+        const response = await fetch(`${config.auth}/login`, reqconf)
+        const fetchres = await response.json()
+        if(response.status === 200){
+            result.json = fetchres
+        }else{
+            result.err = fetchres.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
+}
+
+async function authenticationAdmin(username, password, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    let reqconf = config.postdataconfig({username: username, password: password})
+    try{
+        const response = await fetch(`${config.auth}/admin/login`, reqconf)
+        const fetchres = await response.json()
+        if(response.status === 200){
+            result.json = fetchres
+        }else{
+            result.err = fetchres.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
+}
+
+function checkup(callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    fetch(`${config.auth}/check`, config.postdataconfig({})).then(res=>{
         // fetch body response to json
-        return res.json();
-    }).then(json=>{
-        result.json = json;
+        return {status: res.status, json: res.json()};
+    }).then(resfetch=>{
+        if(resfetch.status === 200) result.json = resfetch.json;
+        else result.err = resfetch.json.message
         callback(result);
     }).catch(err=>{
         result.err = err;
@@ -18,5 +59,7 @@ function authentication(username, password, callback){
 }
 
 export const login = {
-    authentication
+    authentication,
+    authenticationAdmin,
+    checkup
 }

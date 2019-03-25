@@ -1,19 +1,28 @@
 import {config} from './config';
 
-function list(index, rows, search, callback){
+async function list({index, rows, search, sortby, sort}, callback){
     let result = {
         json: null,
         err: null
     }
-    fetch(`${config.endpoint}/`, config.config).then(res=>{
-        return res.json();
-    }).then(json=>{
-        result.json = json;
-        callback(result);
-    }).catch(err=>{
-        result.err = err;
-        callback(result);
-    })
+    try{
+        let response = await fetch(
+            config.getUrlParams(
+                `${config.endpoint}/teacher`, 
+                {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
+                ),
+            config.getconfig);
+        
+        let json = await response.json();
+        if(response.status == 200){
+            result.json = json.response
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
 }
 
 function insert(data, callback){
@@ -80,7 +89,7 @@ function upload(data, callback){
     });
 }
 
-module.exports = {
+export const teacher = {
     list,
     insert,
     del,

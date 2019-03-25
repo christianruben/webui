@@ -2,12 +2,10 @@ let token = localStorage.getItem("user");
 let headers = !token ? {
   'Access-Control-Allow-Origin':'*',
   "Content-Type": "application/json",
-  "Accept": "application/json"
 } : {
   'Access-Control-Allow-Origin':'*',
   "Content-Type": "application/json",
-  "Accept": "application/json",
-  "Authorization": `Bearer ${token}`
+  "Authorization": `${token}`
 }
 export const config= {
     endpoint: "http://localhost:3000/api",
@@ -18,7 +16,7 @@ export const config= {
       headers: headers
     },
     getUrlParams: function(url,params){
-      let query = Object.keys(params).map(k => `${encodeURIComponent(k)} = ${encodeURIComponent(params[k])}`).join('&');
+      let query = Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
       return `${url}?${query}`;
     },
     postdataconfig: function(data){

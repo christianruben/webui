@@ -1,11 +1,23 @@
-export const store = {
+import {teacher} from '../_method'
+
+export const teachers = {
     namespace: true,
     state: {
-        listItems: []
+        table: {}
     },
     actions: {
-        insertItems({commit}, items){
-            commit('additems',items)
+        storeReq({commit}, {index, rows, search, sortby, sort}){
+            commit('removeError')
+            commit('setLoading', true)
+            teacher.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
+                const {err, json} = result;
+                if(err){
+                    commit('setError', err)
+                }else{
+                    commit('addAll', {items: json.table, len: json.length})
+                }
+                commit('setLoading', false)
+            })
         },
         updateItems({commit}, {id, items}){
             commit('updateItems', {id, items})
@@ -20,26 +32,37 @@ export const store = {
         }
     },
     mutations: {
-        addAll(state, {items}){
-            state.listItems = items
+        setLoading(state, stat){
+            state.table = {loading: stat}
+        },
+        setError(state, err){
+            state.table = {error: err}
+        },
+        removeError(state){
+            state.table = {error: null}
+        },
+        addAll(state, {items, len}){
+            state.table = {listItems : items}
+            state.table = {lengthItems: len}
         },
         clear(state){
-            state.listItems.length = 0
+            state.table = {listItems : []}
+            state.table = {lengthItems: 0}
         },
         addItems(state, {item}){
-            state.listItems.push(item)
+            state.table.listItems.push(item)
         },
         updateItems(state, {id, items}){
-            state.listItems.find( (item, index) => {
+            state.table.listItems.find( (item, index) => {
                 if(item.id === id){
-                    state.listItems[index] = items
+                    state.table.listItems[index] = items
                 }
             })
         },
         deleteItems(state, {id}){
-            state.listItems.find((item, index)=>{
+            state.table.listItems.find((item, index)=>{
                 if(item.id === id){
-                    delete state.listItems[index]
+                    delete state.table.listItems[index]
                 }
             })
         }

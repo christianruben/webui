@@ -1,9 +1,9 @@
 <template>
   <v-container>
     <v-dialog v-model="dialog" max-width="500px">
-        <template v-slot:activator="{ on }">
+        <!-- <template v-slot:activator="{ on }">
           <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-        </template>
+        </template> -->
         <v-card>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
@@ -48,12 +48,26 @@
         fixed
         bottom
         right
+        @click="dialog = true"
         >
           <v-icon>add</v-icon>
         </v-btn>
     </v-fab-transition>
+    <v-card-title>
+      Nutrition
+      <v-spacer></v-spacer>
+      <v-text-field
+        v-model="search"
+        append-icon="search"
+        label="Search"
+        single-line
+        hide-details
+      ></v-text-field>
+    </v-card-title>
     <v-data-table
         :headers="headers"
+        :pagination.sync="pagination"
+        :search="search"
         :items="desserts"
         class="elevation-1"
     >
@@ -73,7 +87,22 @@
       <td class="text-xs-right">{{ props.item.fat }}</td>
       <td class="text-xs-right">{{ props.item.carbs }}</td>
       <td class="text-xs-right">{{ props.item.protein }}</td>
-      <td class="text-xs-right">{{ props.item.iron }}</td>
+      <td class="text-xs-center">{{ props.item.iron }}</td>
+      <td class="justify-center layout px-0">
+        <v-icon
+          small
+          class="mr-2"
+          @click="editItem(props.item)"
+        >
+          edit
+        </v-icon>
+        <v-icon
+          small
+          @click="deleteItem(props.item)"
+        >
+          delete
+        </v-icon>
+      </td>
       </template>
     </v-data-table>
   </v-container>
@@ -94,6 +123,12 @@
   export default {
     data () {
       return {
+        sortbylast: null,
+        search: "",
+        pagination: {},
+        loading: false,
+        formTitle: 'Guru',
+        hidden: false,
         dialog: false,editedIndex: -1,
         editedItem: {
           name: '',
@@ -116,11 +151,12 @@
             sortable: false,
             value: 'name'
           },
-          { text: 'Calories', value: 'calories' },
-          { text: 'Fat (g)', value: 'fat' },
-          { text: 'Carbs (g)', value: 'carbs' },
-          { text: 'Protein (g)', value: 'protein' },
-          { text: 'Iron (%)', value: 'iron' }
+          { text: 'Calories', value: 'NIP' },
+          { text: 'Fat (g)', value: 'name' },
+          { text: 'Carbs (g)', value: 'gender' },
+          { text: 'Protein (g)', value: 'religion' },
+          { text: 'Iron (%)', value: 'born_place' },
+          { text: 'Actions', value: 'born_date', sortable: false }
         ],
         desserts: [
           {
@@ -207,6 +243,12 @@
       }
     },
     methods: {
+      editItem () {
+        console.log('edit')
+      },
+      deleteItem () {
+        console.log('delete')
+      },
       close () {
         this.dialog = false
         setTimeout(() => {
@@ -222,7 +264,29 @@
           this.desserts.push(this.editedItem)
         }
         this.close()
+      },
+      getData(){
+        this.loading = true
+        // return new Promise((resolve, reject) => {
+        //   const {sortBy, descending, page, rowsPerPage} = this.pagination
+        // })
+        const {dispatch} = this.$store;
+        const {sortBy, descending, page, rowsPerPage} = this.pagination
+        if(sortBy){
+          this.sortbylast = sortBy
+        }
+        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
+        // dispatch('teacher/deleteItems', {id:1})
       }
-    }
+    },
+    beforeCreate() {
+    },
+    watch: {
+      pagination: {
+        handler () {
+          this.getData()
+        }
+      }
+    },
   }
 </script>

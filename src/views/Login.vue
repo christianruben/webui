@@ -25,7 +25,7 @@
               </v-card-text>
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="primary" @click="sub" :loading="isLoading" :disabled="isLoading">Login</v-btn>
+                <v-btn color="primary" @click="submitLogin" :loading="isLoading" :disabled="isLoading">Login</v-btn>
               </v-card-actions>
             </v-card>
           </v-flex>

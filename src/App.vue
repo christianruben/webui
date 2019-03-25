@@ -28,9 +28,15 @@
       </v-menu>
     </v-toolbar>
     <v-content>
-      <transition name="slide">
         <router-view></router-view>
-      </transition>
+      
+      <div v-if="loadpage" class="text-xs-center">
+        <v-progress-circular
+          :size="50"
+          color="primary"
+          indeterminate
+        ></v-progress-circular>
+      </div>
     </v-content>
     <v-navigation-drawer
       v-if="auth"
@@ -116,6 +122,7 @@ export default {
       dialog: false,
       isLogged: true,
       drawer: null,
+      list: [],
       items: [
         { title: 'Home', icon: 'dashboard', routename: 'news'},
         { title: 'About', icon: 'question_answer', routename: '/'},
@@ -171,6 +178,9 @@ export default {
     },
     getLevel(){
       return this.$store.state.authentication.level
+    },
+    loadpage(){
+      return this.$store.getters['loadpage/isShow']
     }
   },
   beforeCreate(){
