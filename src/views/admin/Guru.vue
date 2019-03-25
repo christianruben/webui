@@ -65,10 +65,12 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
+        v-model="selected"
         :headers="headers"
         :pagination.sync="pagination"
         :search="search"
         :items="desserts"
+        select-all
         class="elevation-1"
     >
       <template slot="headerCell" slot-scope="props">
@@ -82,6 +84,13 @@
       </v-tooltip>
       </template>
       <template slot="items" slot-scope="props">
+      <td>
+        <v-checkbox
+          v-model="props.selected"
+          primary
+          hide-details
+        ></v-checkbox>
+      </td>
       <td>{{ props.item.name }}</td>
       <td class="text-xs-right">{{ props.item.calories }}</td>
       <td class="text-xs-right">{{ props.item.fat }}</td>
@@ -123,6 +132,7 @@
   export default {
     data () {
       return {
+        selected: [],
         sortbylast: null,
         search: "",
         pagination: {},
