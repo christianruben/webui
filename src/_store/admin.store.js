@@ -1,7 +1,7 @@
 export const admin = {
     namespace: true,
     state: {
-        listItems: []
+        result: {}
     },
     actions: {
         insertItems({commit}, items){
@@ -16,30 +16,31 @@ export const admin = {
     },
     getters: {
         getAllItems(state){
-            return state.listItems
-        }
+            return {items: state.result.listItems, len: state.result.listLength}
+        },
     },
     mutations: {
-        addAll(state, {items}){
-            state.listItems = items
+        addAll(state, {items, length}){
+            state.result = {listItems : items}
+            state.result = {listLength : length}
         },
         clear(state){
-            state.listItems.length = 0
+            state.result = {listItems : null}
         },
         addItems(state, {item}){
-            state.listItems.push(item)
+            state.result.listItems.push(item)
         },
         updateItems(state, {id, items}){
-            state.listItems.find( (item, index) => {
+            state.result.listItems.find( (item, index) => {
                 if(item.id === id){
-                    state.listItems[index] = items
+                    state.result.listItems[index] = items
                 }
             })
         },
         deleteItems(state, {id}){
             state.listItems.find((item, index)=>{
                 if(item.id === id){
-                    delete state.listItems[index]
+                    delete state.result.listItems[index]
                 }
             })
         }
