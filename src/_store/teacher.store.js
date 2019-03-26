@@ -28,7 +28,12 @@ export const teachers = {
     },
     getters: {
         getAllItems(state){
-            return state.listItems
+            let list = state.table.listItems
+            return list == undefined || list == null ? [] : list
+        },
+        getLength(state){
+            let length = state.table.lengthItems
+            return length == undefined || length == null ? 0 : length
         }
     },
     mutations: {

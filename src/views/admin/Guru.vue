@@ -169,6 +169,15 @@
           { text: 'Iron (%)', value: 'born_place' },
           { text: 'Actions', value: 'born_date', sortable: false }
         ],
+        theaders: [
+          {text: 'Nama', value: 'name'},
+          {text: 'NIP', value: 'NIP'},
+          {text: 'Kelamin', value: 'gender'},
+          {text: 'Agama', value: 'religion'},
+          {text: 'Tempat Lahir', value: 'born_place'},
+          {text: 'Tanggal Lahir', value: 'born_date'},
+          { text: 'Actions', value: 'born_date', sortable: false }
+        ],
         desserts: [
           {
             name: 'Frozen Yogurt',
