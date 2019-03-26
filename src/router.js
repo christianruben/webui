@@ -23,6 +23,9 @@ const router = new Router({
     {
       path: '/login',
       name: 'login',
+      meta: {
+        title: 'Login'
+      },
       component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
     },
     {
@@ -33,6 +36,9 @@ const router = new Router({
     {
       path: '/news/p/:id',
       name: 'newspost',
+      meta: {
+        title: 'Home'
+      },
       component: () => import(/* webpackChunkName: "newspost" */ './views/Post.vue')
     },
     {
@@ -43,18 +49,83 @@ const router = new Router({
     {
       path: '/admin',
       name: 'admin',
+      meta: {
+        title: 'Admin: Home'
+      },
       component: () => import(/* webpackChunkName: "admin" */ './views/admin/Home.vue')
     }
     ,
     {
       path: '/admin/login',
       name: 'adminlogin',
+      meta: {
+        title: 'Admin: Login'
+      },
       component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
     },
     {
       path: '/admin/guru',
       name: 'adminguru',
+      meta: {
+        title: 'Admin: Guru'
+      },
       component: () => import(/* webpackChunkName: "guru" */'./views/admin/Guru.vue')
+    },
+    {
+      path: '/admin/siswa',
+      name: 'adminsiswa',
+      meta: {
+        title: 'Admin: Siswa'
+      },
+      component: () => import(/* webpackChunkName: "siswa" */'./views/admin/Siswa.vue')
+    },
+    {
+      path: '/admin/user',
+      name: 'adminuser',
+      meta: {
+        title: 'Admin: User'
+      },
+      component: () => import(/* webpackChunkName: "adminlist" */'./views/admin/Admin.vue')
+    },
+    {
+      path: '/admin/akun',
+      name: 'adminakun',
+      meta: {
+        title: 'Admin: Akun'
+      },
+      component: () => import(/* webpackChunkName: "akun" */'./views/admin/Akun.vue')
+    },
+    {
+      path: '/admin/jadwal',
+      name: 'adminjadwal',
+      meta: {
+        title: 'Admin: Jadwal'
+      },
+      component: () => import(/* webpackChunkName: "jadwal" */'./views/admin/Jadwal.vue')
+    },
+    {
+      path: '/admin/pelajaran',
+      name: 'adminpelajaran',
+      meta: {
+        title: 'Admin: Pelajaran'
+      },
+      component: () => import(/* webpackChunkName: "pelajaran" */'./views/admin/Admin.vue')
+    },
+    {
+      path: '/admin/kelas',
+      name: 'adminkelas',
+      meta: {
+        title: 'Admin: Kelas'
+      },
+      component: () => import(/* webpackChunkName: "kelas" */'./views/admin/Admin.vue')
+    },
+    {
+      path: '/admin/berita',
+      name: 'adminberita',
+      meta: {
+        title: 'Admin: Berita'
+      },
+      component: () => import(/* webpackChunkName: "berita" */'./views/admin/Berita.vue')
     }
   ]
 })
@@ -66,6 +137,9 @@ router.beforeEach((to, from, next) => {
   const level = localStorage.getItem("level")
   const adminpublicPages = ['/admin/login'];
   const authRequiredAdmin = !adminpublicPages.includes(to.path);
+  Vue.nextTick( ()=>{
+    document.title = to.meta.title ? to.meta.title : "Home"
+  })
 
   const arrfirst = to.path.split('/')[1];
   // return to /login if user is not logged

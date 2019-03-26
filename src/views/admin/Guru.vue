@@ -65,26 +65,17 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
-        v-model="selected"
-        :headers="headers"
-        :pagination.sync="pagination"
-        :search="search"
-        :items="desserts"
-        item-key="name"
-        select-all
-        class="elevation-1"
+      v-model="selected"
+      :headers="theaders"
+      :items="table"
+      :pagination.sync="pagination"
+      :total-items="lentable"
+      :loading="isLoading"
+      class="elevation-1"
+      item-key="name"
+      select-all
     >
-      <template slot="headerCell" slot-scope="props">
-      <v-tooltip bottom>
-          <span slot="activator">
-          {{ props.header.text }}
-          </span>
-          <span>
-          {{ props.header.text }}
-          </span>
-      </v-tooltip>
-      </template>
-      <template slot="items" slot-scope="props">
+      <template v-slot:items="props">
       <td>
         <v-checkbox
           v-model="props.selected"
@@ -93,11 +84,11 @@
         ></v-checkbox>
       </td>
       <td>{{ props.item.name }}</td>
-      <td class="text-xs-right">{{ props.item.calories }}</td>
-      <td class="text-xs-right">{{ props.item.fat }}</td>
-      <td class="text-xs-right">{{ props.item.carbs }}</td>
-      <td class="text-xs-right">{{ props.item.protein }}</td>
-      <td class="text-xs-center">{{ props.item.iron }}</td>
+      <td>{{ props.item.NIP }}</td>
+      <td>{{ props.item.gender }}</td>
+      <td>{{ props.item.religion }}</td>
+      <td>{{ props.item.born_place }}</td>
+      <td>{{ props.item.dateborn }}</td>
       <td class="justify-center layout px-0">
         <v-icon
           small
@@ -133,14 +124,16 @@
   export default {
     data () {
       return {
+        total: 0,
         selected: [],
         sortbylast: null,
         search: "",
-        pagination: {},
         loading: false,
         formTitle: 'Guru',
         hidden: false,
-        dialog: false,editedIndex: -1,
+        pagination: {},
+        dialog: false,
+        editedIndex: -1,
         editedItem: {
           name: '',
           calories: 0,
@@ -155,20 +148,6 @@
           carbs: 0,
           protein: 0
         },
-        headers: [
-          {
-            text: 'Dessert (100g serving)',
-            align: 'left',
-            sortable: false,
-            value: 'name'
-          },
-          { text: 'Calories', value: 'NIP' },
-          { text: 'Fat (g)', value: 'name' },
-          { text: 'Carbs (g)', value: 'gender' },
-          { text: 'Protein (g)', value: 'religion' },
-          { text: 'Iron (%)', value: 'born_place' },
-          { text: 'Actions', value: 'born_date', sortable: false }
-        ],
         theaders: [
           {text: 'Nama', value: 'name'},
           {text: 'NIP', value: 'NIP'},
@@ -176,98 +155,14 @@
           {text: 'Agama', value: 'religion'},
           {text: 'Tempat Lahir', value: 'born_place'},
           {text: 'Tanggal Lahir', value: 'born_date'},
-          { text: 'Actions', value: 'born_date', sortable: false }
-        ],
-        desserts: [
-          {
-            name: 'Frozen Yogurt',
-            calories: 159,
-            fat: 6.0,
-            carbs: 24,
-            protein: 4.0,
-            iron: '1%'
-          },
-          {
-            name: 'Ice cream sandwich',
-            calories: 237,
-            fat: 9.0,
-            carbs: 37,
-            protein: 4.3,
-            iron: '1%'
-          },
-          {
-            name: 'Eclair',
-            calories: 262,
-            fat: 16.0,
-            carbs: 23,
-            protein: 6.0,
-            iron: '7%'
-          },
-          {
-            name: 'Cupcake',
-            calories: 305,
-            fat: 3.7,
-            carbs: 67,
-            protein: 4.3,
-            iron: '8%'
-          },
-          {
-            name: 'Gingerbread',
-            calories: 356,
-            fat: 16.0,
-            carbs: 49,
-            protein: 3.9,
-            iron: '16%'
-          },
-          {
-            name: 'Jelly bean',
-            calories: 375,
-            fat: 0.0,
-            carbs: 94,
-            protein: 0.0,
-            iron: '0%'
-          },
-          {
-            name: 'Lollipop',
-            calories: 392,
-            fat: 0.2,
-            carbs: 98,
-            protein: 0,
-            iron: '2%'
-          },
-          {
-            name: 'Honeycomb',
-            calories: 408,
-            fat: 3.2,
-            carbs: 87,
-            protein: 6.5,
-            iron: '45%'
-          },
-          {
-            name: 'Donut',
-            calories: 452,
-            fat: 25.0,
-            carbs: 51,
-            protein: 4.9,
-            iron: '22%'
-          },
-          {
-            name: 'KitKat',
-            calories: 518,
-            fat: 26.0,
-            carbs: 65,
-            protein: 7,
-            iron: '6%'
-          }
+          { text: 'Actions', sortable: false }
         ]
       }
     },
     methods: {
       editItem () {
-        console.log('edit')
       },
       deleteItem () {
-        console.log('delete')
       },
       close () {
         this.dialog = false
@@ -285,28 +180,50 @@
         }
         this.close()
       },
-      getData(){
+      getDataFromApi(){
         this.loading = true
-        // return new Promise((resolve, reject) => {
-        //   const {sortBy, descending, page, rowsPerPage} = this.pagination
-        // })
         const {dispatch} = this.$store;
-        const {sortBy, descending, page, rowsPerPage} = this.pagination
+        let {sortBy, descending, page, rowsPerPage} = this.pagination
         if(sortBy){
           this.sortbylast = sortBy
         }
+        console.log(this.selected)
         dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
-        // dispatch('teacher/deleteItems', {id:1})
       }
     },
-    beforeCreate() {
+    computed: {
+      table(){
+        return this.$store.getters['getAllItems']
+      },
+      isLoading(){
+        return this.$store.getters['getLoading']
+      },
+      lentable(){
+        return this.$store.getters['getLenItems']
+      },
+      params(nv){
+          return {
+              ...this.pagination,
+              query: this.search
+          }
+      }
     },
     watch: {
       pagination: {
         handler () {
-          this.getData()
-        }
+          this.getDataFromApi();
+        },
+        deep: true
+      },
+      params: {
+          handler(){
+              this.getDataFromApi()
+          },
+          deep: true
       }
+    },
+    mounted () {
+      this.getDataFromApi();
     },
   }
 </script>

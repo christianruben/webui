@@ -1,11 +1,14 @@
-let token = localStorage.getItem("user");
-let headers = !token ? {
-  'Access-Control-Allow-Origin':'*',
-  "Content-Type": "application/json",
-} : {
-  'Access-Control-Allow-Origin':'*',
-  "Content-Type": "application/json",
-  "Authorization": `${token}`
+// let token = localStorage.getItem("user");
+function getHeaders(token){
+  let headers = !token ? {
+    'Access-Control-Allow-Origin':'*',
+    "Content-Type": "application/json",
+  } : {
+    'Access-Control-Allow-Origin':'*',
+    "Content-Type": "application/json",
+    "Authorization": `${token}`
+  }
+  return headers
 }
 export const config= {
     endpoint: "http://localhost:3000/api",
@@ -13,7 +16,7 @@ export const config= {
     getconfig: {
       method: 'GET',
       mode: 'cors',
-      headers: headers
+      headers: getHeaders(localStorage.getItem('user'))
     },
     getUrlParams: function(url,params){
       let query = Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
@@ -23,7 +26,7 @@ export const config= {
       let result = {
         method: 'POST',
         mode: 'cors',
-        headers: headers,
+        headers: getHeaders(localStorage.getItem('user')),
         body: JSON.stringify(data)
       }
       return result
@@ -32,7 +35,7 @@ export const config= {
       let result = {
         method: 'PUT',
         mode: 'cors',
-        headers: headers,
+        headers: getHeaders(localStorage.getItem('user')),
         body: JSON.stringify(data)
       }
       return result;
@@ -40,16 +43,16 @@ export const config= {
     postconfig: {
         method: 'POST',
         mode: 'cors',
-        headers: headers
+        headers: getHeaders(localStorage.getItem('user'))
     },
     deleteconfig: {
         method: 'DELETE',
         mode: 'cors',
-        headers: headers
+        headers: getHeaders(localStorage.getItem('user'))
     },
     putconfig: {
         method: 'PUT',
         mode: 'cors',
-        headers: headers
+        headers: getHeaders(localStorage.getItem('user'))
     }
 }

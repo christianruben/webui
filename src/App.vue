@@ -4,7 +4,7 @@
       fixed
       app>
       <v-toolbar-side-icon v-if="!drawer" @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>Title</v-toolbar-title>
+      <v-toolbar-title>{{ $route.meta.title }}</v-toolbar-title>
       <v-spacer></v-spacer>
       <v-menu bottom left>
         <v-btn
@@ -29,7 +29,6 @@
     </v-toolbar>
     <v-content>
         <router-view></router-view>
-      
       <div v-if="loadpage" class="text-xs-center">
         <v-progress-circular
           :size="50"
@@ -48,13 +47,11 @@
           <v-list-tile-avatar>
             <img src="https://randomuser.me/api/portraits/men/85.jpg">
           </v-list-tile-avatar>
-
           <v-list-tile-content>
             <v-list-tile-title>John Leider</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
-
       <v-list v-if="getLevel == 2" class="pt-0" dense>
         <v-divider></v-divider>
         <v-list-group
@@ -78,33 +75,19 @@
             </v-list-tile>
         </v-list-group>
         <v-list-tile
-          v-for="item in list"
+          v-for="item in (getLevel == 2 ? itemsAdmin : items)"
           :key="item.title"
           @click="pushRoute(item.routename)"
         >
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-tile-action>
-
           <v-list-tile-content>
             <v-list-tile-title>{{ item.title }}</v-list-tile-title>
           </v-list-tile-content>
         </v-list-tile>
       </v-list>
     </v-navigation-drawer>
-    <!-- modal -->
-    <v-dialog v-model="dialog" fullscreen hide-overlay transition="dialog-bottom-transition">
-      <v-card>
-        <v-toolbar dark color="primary">
-          <v-btn icon dark @click="dialog = false">
-            <v-icon>arrow_back</v-icon>
-          </v-btn>
-          <v-toolbar-title>Profile</v-toolbar-title>
-        </v-toolbar>
-        <Profile/>
-      </v-card>
-    </v-dialog>
-    <!-- modal -->
   </v-app>
 </template>
 
@@ -119,6 +102,7 @@ export default {
   data () {
     return {
       //
+      title: "",
       dialog: false,
       isLogged: true,
       drawer: null,
@@ -130,7 +114,7 @@ export default {
         { title: 'Nilai', icon: 'edit', routename: 'nilai'}
       ],
       itemsAdmin: [
-        { title: 'Home', icon: 'dashboard', routename: 'news'},
+        { title: 'Home', icon: 'dashboard', routename: '/admin'},
       ],
       dataMaster: [
         { title: 'Siswa', icon: 'people', path: '/admin/siswa'},

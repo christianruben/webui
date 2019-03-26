@@ -30,6 +30,7 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 1})
                         commit('setLogin')
+                        location.reload()
                         router.replace('/');
                     }else{
                         commit('setErrMsg', json.message)
@@ -50,6 +51,7 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 2})
                         commit('setLogin')
+                        location.reload()
                         router.replace('/admin')
                     }else{
                         commit('setErrMsg', json.message)

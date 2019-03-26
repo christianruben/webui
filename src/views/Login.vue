@@ -9,7 +9,7 @@
                 <v-spacer></v-spacer>
               </v-toolbar>
                 <v-alert
-                    :value="errMessage && (username != '' && password != '')"
+                    :value="errMessage"
                     color="error"
                     icon="warning"
                     outline
@@ -98,6 +98,9 @@
                         type: 2
                     }
                 }
+            },
+            isLoged(){
+                return this.$store.getters['authentication/isUserLogged']
             }
         },
     }

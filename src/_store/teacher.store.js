@@ -3,7 +3,10 @@ import {teacher} from '../_method'
 export const teachers = {
     namespace: true,
     state: {
-        table: {}
+        listItems: [],
+        err: null,
+        totalItems: 0,
+        loading: false
     },
     actions: {
         storeReq({commit}, {index, rows, search, sortby, sort}){
@@ -11,12 +14,14 @@ export const teachers = {
             commit('setLoading', true)
             teacher.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
                 const {err, json} = result;
-                if(err){
-                    commit('setError', err)
-                }else{
-                    commit('addAll', {items: json.table, len: json.length})
-                }
-                commit('setLoading', false)
+                setTimeout(()=>{
+                    if(err){
+                        commit('setError', err)
+                    }else{
+                        commit('addAll', {items: json.table, len: json.len})
+                    }
+                    commit('setLoading', false)
+                }, 100)
             })
         },
         updateItems({commit}, {id, items}){
@@ -28,46 +33,50 @@ export const teachers = {
     },
     getters: {
         getAllItems(state){
-            let list = state.table.listItems
-            return list == undefined || list == null ? [] : list
+            return state.listItems
         },
-        getLength(state){
-            let length = state.table.lengthItems
-            return length == undefined || length == null ? 0 : length
+        getLoading(state){
+            return state.loading
+        },
+        getLenItems(state){
+            return state.totalItems
         }
     },
     mutations: {
+        setPagination (state, payload) {
+            state.pagination = payload
+        },
         setLoading(state, stat){
-            state.table = {loading: stat}
+            state.loading = stat
         },
         setError(state, err){
-            state.table = {error: err}
+            state.error = err
         },
         removeError(state){
-            state.table = {error: null}
+            state.error = null
         },
         addAll(state, {items, len}){
-            state.table = {listItems : items}
-            state.table = {lengthItems: len}
+            state.listItems = items
+            state.totalItems = len
         },
         clear(state){
-            state.table = {listItems : []}
-            state.table = {lengthItems: 0}
+            state.listItems = []
+            state.lengthItems = 0
         },
         addItems(state, {item}){
-            state.table.listItems.push(item)
+            state.listItems.push(item)
         },
         updateItems(state, {id, items}){
-            state.table.listItems.find( (item, index) => {
+            state.listItems.find( (item, index) => {
                 if(item.id === id){
-                    state.table.listItems[index] = items
+                    state.listItems[index] = items
                 }
             })
         },
         deleteItems(state, {id}){
-            state.table.listItems.find((item, index)=>{
+            state.listItems.find((item, index)=>{
                 if(item.id === id){
-                    delete state.table.listItems[index]
+                    delete state.listItems[index]
                 }
             })
         }
