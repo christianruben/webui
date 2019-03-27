@@ -181,7 +181,7 @@
         this.close()
       },
       getDataFromApi(){
-        this.loading = true
+        if(this.isLoading) return;
         const {dispatch} = this.$store;
         let {sortBy, descending, page, rowsPerPage} = this.pagination
         if(sortBy){

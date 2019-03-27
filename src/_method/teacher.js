@@ -11,7 +11,7 @@ async function list({index, rows, search, sortby, sort}, callback){
                 `${config.endpoint}/teacher`, 
                 {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
                 ),
-            config.getconfig);
+            config.getconfig());
         
         let json = await response.json();
         if(response.status == 200){

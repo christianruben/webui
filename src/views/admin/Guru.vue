@@ -181,14 +181,13 @@
         this.close()
       },
       getDataFromApi(){
-        this.loading = true
+        if(this.isLoading) return;
         const {dispatch} = this.$store;
         let {sortBy, descending, page, rowsPerPage} = this.pagination
         if(sortBy){
           this.sortbylast = sortBy
         }
-        console.log(this.selected)
-        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
+	dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
       }
     },
     computed: {

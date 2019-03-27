@@ -13,14 +13,16 @@ function getHeaders(token){
 export const config= {
     endpoint: "http://localhost:3000/api",
     auth: "http://localhost:3000/authentication",
-    getconfig: {
-      method: 'GET',
-      mode: 'cors',
-      headers: getHeaders(localStorage.getItem('user'))
-    },
     getUrlParams: function(url,params){
       let query = Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
       return `${url}?${query}`;
+    },
+    getconfig: function(){
+	return {
+		method: 'GET',
+		mode: 'cors',
+		headers: getHeaders(localStorage.getItem('user'))
+	}
     },
     postdataconfig: function(data){
       let result = {
