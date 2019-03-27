@@ -2,6 +2,7 @@ const user = localStorage.getItem("user")
 const level = localStorage.getItem("level")
 import {login} from '../_method'
 import router from '../router'
+import {util} from '../util'
 
 const initState = user ? {isLogged: true, user: user, loading: false, errmsg: null, level: level} : {isLogged: false, user: user, loading: false, errmsg: null, level: null}
 
@@ -9,18 +10,6 @@ export const authentication = {
     namespaced: true,
     state: initState,
     actions: {
-        fakelogin({commit}){
-            commit('saveUser', {user: "dsdasdoqwe781232981291qweuqhweo", level: 1})
-            commit('setLogin')
-            localStorage.setItem("user", 'dsdasdoqwe781232981291qweuqhweo')
-            localStorage.setItem("level", 1)
-        },
-        fakeloginadm({commit}){
-            commit('saveUser', {user: 'dsdasdoqwe781232981291qweuqhweo', level: 2})
-            commit('setLogin')
-            localStorage.setItem("user", "dsdasdoqwe781232981291qweuqhweo")
-            localStorage.setItem("level", 2)
-        },
         logIn({commit}, {username, password}){
             commit('setLoading', true)
             commit('setErrMsg', null)
@@ -30,8 +19,12 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 1})
                         commit('setLogin')
-                        location.reload()
-                        router.replace('/');
+                        let d = new Date()
+                        d.setTime(d.getTime() + (1*24*60*60*1000))
+                        let expires = "expires="+ d.toUTCString()
+                        util.setCookie("Token", json.token, expires)
+                        util.setCookie("IdToken", 1, expires)
+                        router.push('/')
                     }else{
                         commit('setErrMsg', json.message)
                         setTimeout(()=>{
@@ -51,8 +44,12 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 2})
                         commit('setLogin')
-                        location.reload()
-                        router.replace('/admin')
+                        let d = new Date()
+                        d.setTime(d.getTime() + (1*24*60*60*1000))
+                        let expires = "expires="+ d.toUTCString()
+                        util.setCookie("Token", json.token, expires)
+                        util.setCookie("IdToken", 2, expires)
+                        router.push('/admin')
                     }else{
                         commit('setErrMsg', json.message)
                         setTimeout(()=>{
@@ -110,6 +107,7 @@ export const authentication = {
             state.isLogged = true
         },
         setLogout(state){
+            util.deleteAllCookies()
             localStorage.clear()
             state.isLogged = false
             state.level = null

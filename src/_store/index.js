@@ -13,6 +13,6 @@ export default new Vuex.Store({
     header,
     authentication,
     loadpage,
-    teachers
+    teachers,
   }
 })

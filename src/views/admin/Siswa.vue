@@ -172,7 +172,7 @@
       lentable(){
         return this.$store.getters['getLenItems']
       },
-      params(nv){
+      params(){
           return {
               ...this.pagination,
               query: this.search

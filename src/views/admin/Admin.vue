@@ -187,7 +187,6 @@
         if(sortBy){
           this.sortbylast = sortBy
         }
-        console.log(this.selected)
         dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
       }
     },
@@ -201,7 +200,7 @@
       lentable(){
         return this.$store.getters['getLenItems']
       },
-      params(nv){
+      params(){
           return {
               ...this.pagination,
               query: this.search

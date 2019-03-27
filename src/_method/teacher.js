@@ -11,9 +11,8 @@ async function list({index, rows, search, sortby, sort}, callback){
                 `${config.endpoint}/teacher`, 
                 {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
                 ),
-            config.getconfig());
-        
-        let json = await response.json();
+            config.getconfig())
+        let json = await response.json()
         if(response.status == 200){
             result.json = json.response
         }else{
@@ -25,20 +24,23 @@ async function list({index, rows, search, sortby, sort}, callback){
     callback(result)
 }
 
-function insert(data, callback){
+async function insert(data, callback){
     let result = {
         json: null,
         err: null
     }
-    fetch(`${config.endpoint}/`, config.postconfig).then(res=>{
-        return res.json();
-    }).then(json=>{
-        result.json = json;
-        callback(result);
-    }).catch(err=>{
-        result.err = err;
-        callback(result);
-    });
+    try{
+        let response = await fetch(`${config.endpoint}/teacher`, config.postdatafile(data))
+        let json = await response.json()
+        if(response.status == 200){
+            result.json = json.response
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
 }
 
 function del(id, callback){

@@ -24,6 +24,19 @@ export const teachers = {
                 }, 100)
             })
         },
+        uploadTeacher({commit}, {data}) {
+            commit('removeError')
+            commit('setLoading', true)
+            teacher.insert(data, (result)=>{
+                const {err, json} = result;
+                if(err){
+                    commit('setError', err)
+                }else{
+                    console.log(json)
+                }
+            })
+            commit('setLoading', false)
+        },
         updateItems({commit}, {id, items}){
             commit('updateItems', {id, items})
         },

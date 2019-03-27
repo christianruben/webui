@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-dialog v-model="dialog" max-width="500px">
+    <v-dialog persistent v-model="dialog" max-width="600px">
         <!-- <template v-slot:activator="{ on }">
           <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
         </template> -->
@@ -10,25 +10,7 @@
           </v-card-title>
 
           <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
+            <Form :forminput="forminput"/>
           </v-card-text>
 
           <v-card-actions>
@@ -121,15 +103,31 @@
 </style>
 
 <script>
+  import Form from '../../components/Form'
   export default {
+    components: {
+      Form
+    },
     data () {
       return {
+        forminput: {
+          imageFile: null,
+          name: 'Kristian',
+          nip: '023912389123',
+          gender: 'Lelaki',
+          religion: 'Kristen Protestan',
+          bornplace: 'Jakarta',
+          borndate: '',
+          address: 'Tangerang',
+          phonenumber: '08943429343',
+          relationship: 'Single',
+        },
         total: 0,
         selected: [],
         sortbylast: null,
         search: "",
         loading: false,
-        formTitle: 'Guru',
+        formTitle: 'Input Guru',
         hidden: false,
         pagination: {},
         dialog: false,
@@ -173,11 +171,25 @@
       },
 
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        } else {
-          this.desserts.push(this.editedItem)
-        }
+        // if (this.editedIndex > -1) {
+        //   Object.assign(this.desserts[this.editedIndex], this.editedItem)
+        // } else {
+        //   this.desserts.push(this.editedItem)
+        // }
+        if(this.isLoading) return;
+        const formData = new FormData()
+        formData.append('imgusr', this.forminput.imageFile)
+        formData.append('name', this.forminput.name)
+        formData.append('nip', this.forminput.nip)
+        formData.append('gender', this.forminput.gender)
+        formData.append('religion', this.forminput.religion)
+        formData.append('bornPlace', this.forminput.bornplace)
+        formData.append('bornDate', this.forminput.borndate)
+        formData.append('address', this.forminput.address)
+        formData.append('phoneNumber', this.forminput.phonenumber)
+        formData.append('relationship', this.forminput.relationship)
+        const {dispatch} = this.$store;
+        dispatch('uploadTeacher', {data: formData})
         this.close()
       },
       getDataFromApi(){
@@ -187,7 +199,7 @@
         if(sortBy){
           this.sortbylast = sortBy
         }
-	dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
+        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
       }
     },
     computed: {
@@ -200,7 +212,7 @@
       lentable(){
         return this.$store.getters['getLenItems']
       },
-      params(nv){
+      params(){
           return {
               ...this.pagination,
               query: this.search

@@ -10,6 +10,15 @@ function getHeaders(token){
   }
   return headers
 }
+function getHeadersv2(token){
+  let headers = !token ? {
+    'Access-Control-Allow-Origin':'*',
+  } : {
+    'Access-Control-Allow-Origin':'*',
+    "Authorization": `${token}`
+  }
+  return headers
+}
 export const config= {
     endpoint: "http://localhost:3000/api",
     auth: "http://localhost:3000/authentication",
@@ -30,6 +39,15 @@ export const config= {
         mode: 'cors',
         headers: getHeaders(localStorage.getItem('user')),
         body: JSON.stringify(data)
+      }
+      return result
+    },
+    postdatafile: function(data){
+      let result = {
+        method: 'POST',
+        mode: 'cors',
+        headers: getHeadersv2(localStorage.getItem('user')),
+        body: data
       }
       return result
     },

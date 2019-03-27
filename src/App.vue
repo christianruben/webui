@@ -92,12 +92,7 @@
 </template>
 
 <script>
-import Profile from './components/Profile'
-
 export default {
-  components: {
-    Profile
-  },
   name: 'App',
   data () {
     return {

@@ -91,7 +91,7 @@
         },
       getDataFromApi () {
         this.loading = true
-        return new Promise((resolve, reject) => {
+        return new Promise((resolve) => {
           const { sortBy, descending, page, rowsPerPage } = this.pagination
 
           let items = this.getDesserts()
