@@ -1,50 +1,143 @@
 <template>
-    <v-layout row justify-center>
-        <v-dialog v-model="dialog" persistent max-width="600px">
-            <v-card>
-                <v-card-title>
-                    <span class="headline"></span>
-                </v-card-title>
-                <form>
-                    <v-text-field
-                    :counter="10"
-                    label="Name"
-                    required
-                    ></v-text-field>
-                    <v-text-field
-                    label="E-mail"
-                    required
-                    ></v-text-field>
-
-                    <v-btn @click="submit">submit</v-btn>
-                    <v-btn @click="clear">clear</v-btn>
-                </form>
-            </v-card>
-        </v-dialog>
-    </v-layout>
+  <form>
+    <v-flex xs12 class="text-xs-center text-sm-center text-md-center text-lg-center">
+      <img :src="imageUrl" height="150" v-if="imageUrl"/>
+      <v-text-field label="Select Image" @click='pickFile' v-model='imageName' prepend-icon='attach_file'></v-text-field>
+      <input
+        type="file"
+        style="display: none"
+        ref="image"
+        accept="image/*"
+        @change="onFilePicked"
+      >
+    </v-flex>
+    <v-text-field
+      v-model="forminput.name"
+      :counter="50"
+      label="Name"
+      data-vv-name="name"
+      required
+    ></v-text-field>
+    <v-text-field
+      v-model="forminput.nip"
+      :counter="20"
+      label="NIP"
+      required
+    ></v-text-field>
+    <v-select
+      v-model="forminput.gender"
+      :items="genderlist"
+      label="Jenis Kelamin"
+      required
+    ></v-select>
+    <v-select
+      v-model="forminput.religion"
+      :items="religionlist"
+      label="Agama"
+      required
+    ></v-select>
+    <v-text-field
+      v-model="forminput.bornplace"
+      :counter="50"
+      label="Tempat Lahir"
+      required
+    ></v-text-field>
+    <v-menu
+        ref="menu"
+        v-model="menu"
+        :close-on-content-click="false"
+        :nudge-right="40"
+        :return-value.sync="forminput.borndate"
+        lazy
+        transition="scale-transition"
+        offset-y
+        full-width
+        min-width="290px"
+      >
+      <template v-slot:activator="{ on }">
+        <v-text-field
+          v-model="forminput.borndate"
+          label="Picker in menu"
+          prepend-icon="event"
+          readonly
+          v-on="on"
+          required
+        ></v-text-field>
+      </template>
+      <v-date-picker
+        ref="picker"
+        v-model="forminput.borndate"
+        :max="new Date().toISOString().substr(0, 10)"
+        min="1950-01-01"
+        @change="save"
+        required
+      ></v-date-picker>
+    </v-menu>
+    <v-textarea
+      :counter="50"
+      label="Alamat"
+      hint="Tulis alamat disini..."
+      v-model="forminput.address"
+    ></v-textarea>
+    <v-text-field
+      v-model="forminput.phonenumber"
+      :counter="12"
+      label="Nomor Telepon"
+      required
+    ></v-text-field>
+    <v-select
+      v-model="forminput.relationship"
+      :items="relationshiplist"
+      label="Hubungan"
+      required
+    ></v-select>
+  </form>
 </template>
-
 <script>
-export default {
+  export default {
     props: {
-        dialog: Boolean,
+      forminput: Object,
+      imageUrl: String
     },
-    data() {
-        return {
-            nip: "",
-            name: "",
-            gender: "",
-            religion: "",
-            bornplace: "",
-            borndate: "",
-            address: "",
-            phonenumber: "",
-            relationship: "",
-            nipRules: [
-                (v) => !!v || "nip is required",
-                (v) => v && v.length > 6 || "Nip must more than 6 number"
-            ],
+    data: () => ({
+      menu: false,
+      genderlist: ['Lelaki', 'Perempuan'],
+      religionlist: ['Islam', 'Kristen Protestan', 'Katolik', 'Buddha', 'Hindu', 'Kong Hu Cu'],
+      relationshiplist: ['Single', 'Single Parent', 'Married'],
+      dialog: false,
+      imageName: ''
+    }),
+    methods: {
+      save (date) {
+        this.$refs.menu.save(date)
+      },
+      pickFile () {
+            this.$refs.image.click ()
+      },
+      onFilePicked (e) {
+        const files = e.target.files
+        if(files[0] !== undefined) {
+          this.imageName = files[0].name
+          if(this.imageName.lastIndexOf('.') <= 0) {
+            return
+          }
+          const fr = new FileReader ()
+          fr.readAsDataURL(files[0])
+          fr.addEventListener('load', () => {
+            this.imageUrl = fr.result
+            this.forminput.imageFile = files[0] // this is an image file that can be sent to server...
+          })
+        } else {
+          this.imageName = ''
+          this.forminput.imageFile = ''
+          this.imageUrl = ''
         }
+      }
     },
-}
+    watch: {
+      menu (val) {
+        val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
+      },
+    },
+  }
 </script>

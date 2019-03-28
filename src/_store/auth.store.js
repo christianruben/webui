@@ -1,9 +1,8 @@
-const user = localStorage.getItem("user")
-const level = localStorage.getItem("level")
 import {login} from '../_method'
+import {EventBus} from '../evenbus'
 import router from '../router'
-import {util} from '../util'
-
+const user = EventBus.$session.get("apitoken")
+const level = EventBus.$session.get("userlvl")
 const initState = user ? {isLogged: true, user: user, loading: false, errmsg: null, level: level} : {isLogged: false, user: user, loading: false, errmsg: null, level: null}
 
 export const authentication = {
@@ -19,8 +18,6 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 1})
                         commit('setLogin')
-                        // Vue.$session.set('Token', json.token)
-                        // Vue.$session.set('TokenLvl', 1)
                         router.push('/')
                     }else{
                         commit('setErrMsg', json.message)
@@ -41,8 +38,6 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 2})
                         commit('setLogin')
-                        // Vue.$session.set('Token', json.token)
-                        // Vue.$session.set('TokenLvl', 2)
                         router.push('/admin')
                     }else{
                         commit('setErrMsg', json.message)
@@ -97,14 +92,15 @@ export const authentication = {
         saveUser(state, {user, level}){
             state.user = user
             state.level = level
-            localStorage.setItem("user", user)
-            localStorage.setItem("level", level)
+            window.$cookies.set('apitoken', user)
+            window.$cookies.set('userlvl', level)
         },
         setLogin(state){
             state.isLogged = true
         },
         setLogout(state){
-            util.deleteAllCookies()
+            window.$cookies.remove('apitoken')
+            window.$cookies.remove('userlvl')
             localStorage.clear()
             state.isLogged = false
             state.level = null

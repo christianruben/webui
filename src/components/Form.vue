@@ -96,7 +96,8 @@
 <script>
   export default {
     props: {
-      forminput: Object
+      forminput: Object,
+      imageUrl: String
     },
     data: () => ({
       menu: false,
@@ -104,8 +105,7 @@
       religionlist: ['Islam', 'Kristen Protestan', 'Katolik', 'Buddha', 'Hindu', 'Kong Hu Cu'],
       relationshiplist: ['Single', 'Single Parent', 'Married'],
       dialog: false,
-      imageName: '',
-      imageUrl: ''
+      imageName: ''
     }),
     methods: {
       save (date) {
@@ -128,7 +128,6 @@
             this.forminput.imageFile = files[0] // this is an image file that can be sent to server...
           })
         } else {
-          console.log('file fail')
           this.imageName = ''
           this.forminput.imageFile = ''
           this.imageUrl = ''
@@ -138,7 +137,7 @@
     watch: {
       menu (val) {
         val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
-      }
+      },
     },
   }
 </script>

@@ -4,9 +4,11 @@ export const teachers = {
     namespace: true,
     state: {
         listItems: [],
-        err: null,
+        error: null,
         totalItems: 0,
-        loading: false
+        loading: false,
+        upload: false,
+        dialog: false
     },
     actions: {
         storeReq({commit}, {index, rows, search, sortby, sort}){
@@ -27,12 +29,35 @@ export const teachers = {
         uploadTeacher({commit}, {data}) {
             commit('removeError')
             commit('setLoading', true)
+            commit('setUpload', true)
             teacher.insert(data, (result)=>{
                 const {err, json} = result;
                 if(err){
                     commit('setError', err)
+                    commit('setUpload', true)
                 }else{
-                    console.log(json)
+                    if(json){
+                        commit('setUpload', false)
+                        commit('setDialog', false)
+                    }
+                }
+            })
+            commit('setLoading', false)
+        },
+        updateTeacher({commit}, {data}){
+            commit('removeError')
+            commit('setLoading', true)
+            commit('setUpload', true)
+            teacher.update(data, (result)=>{
+                const {err, json} = result;
+                if(err){
+                    commit('setError', err)
+                    commit('setUpload', true)
+                }else{
+                    if(json){
+                        commit('setUpload', false)
+                        commit('setDialog', false)
+                    }
                 }
             })
             commit('setLoading', false)
@@ -42,6 +67,32 @@ export const teachers = {
         },
         deleteItems({commit}, {id}){
             commit('deleteItems', {id})
+        },
+        deleteTeacher({commit}, {id}){
+            commit('removeError')
+            commit('setLoading', true)
+            commit('setUpload', true)
+            teacher.del(id, result=>{
+                const {err, json} = result
+                if(err){
+                    commit('setError', err)
+                    commit('setUpload', true)
+                }else{
+                    if(json){
+                        commit('setUpload', false)
+                    }
+                }
+            })
+            commit('setLoading', false)
+        },
+        removeError({commit}){
+            commit('setError', null)
+        },
+        openDialog({commit}){
+            commit('setDialog', true)
+        },
+        closeDialog({commit}){
+            commit('setDialog', false)
         }
     },
     getters: {
@@ -53,6 +104,15 @@ export const teachers = {
         },
         getLenItems(state){
             return state.totalItems
+        },
+        getStatUpload(state){
+            return state.upload
+        },
+        getError(state){
+            return state.error
+        },
+        getDialog(state){
+            return state.dialog
         }
     },
     mutations: {
@@ -61,6 +121,9 @@ export const teachers = {
         },
         setLoading(state, stat){
             state.loading = stat
+        },
+        setDialog(state, stat){
+            state.dialog = stat
         },
         setError(state, err){
             state.error = err
@@ -71,6 +134,9 @@ export const teachers = {
         addAll(state, {items, len}){
             state.listItems = items
             state.totalItems = len
+        },
+        setUpload(state, val){
+            state.upload = val
         },
         clear(state){
             state.listItems = []

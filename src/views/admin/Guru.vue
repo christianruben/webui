@@ -1,42 +1,47 @@
 <template>
   <v-container>
-    <v-dialog persistent v-model="dialog" max-width="600px">
-        <!-- <template v-slot:activator="{ on }">
-          <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-        </template> -->
+    <v-dialog persistent :value="dialogActive" max-width="600px">
         <v-card>
+        <v-alert
+          :value="errorMsg"
+          dismissible
+          color="error"
+        >
+          {{errorMsg}}
+        </v-alert>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
           </v-card-title>
 
           <v-card-text>
-            <Form :forminput="forminput"/>
+            <Form :forminput="forminput" :imageUrl="imageUrl"/>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat @click="closeDialog">Cancel</v-btn>
             <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <Dialog :dialog="alert" :title="`Hapus data`" :text="`Anda yakin ingin menghapus data ini ?`" v-on:ok="OkButton" v-on:no="NoButton"/>
       <v-fab-transition>
         <v-btn
         v-show="!hidden"
         color="pink"
         fab
         dark
-        medium
+        small
         fixed
         bottom
         right
-        @click="dialog = true"
+        @click="addItem"
         >
           <v-icon>add</v-icon>
         </v-btn>
     </v-fab-transition>
     <v-card-title>
-      Nutrition
+      Table Guru
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -54,40 +59,50 @@
       :total-items="lentable"
       :loading="isLoading"
       class="elevation-1"
-      item-key="name"
-      select-all
     >
       <template v-slot:items="props">
-      <td>
-        <v-checkbox
-          v-model="props.selected"
-          primary
-          hide-details
-        ></v-checkbox>
-      </td>
-      <td>{{ props.item.name }}</td>
-      <td>{{ props.item.NIP }}</td>
-      <td>{{ props.item.gender }}</td>
-      <td>{{ props.item.religion }}</td>
-      <td>{{ props.item.born_place }}</td>
-      <td>{{ props.item.dateborn }}</td>
-      <td class="justify-center layout px-0">
-        <v-icon
-          small
-          class="mr-2"
-          @click="editItem(props.item)"
-        >
-          edit
-        </v-icon>
-        <v-icon
-          small
-          @click="deleteItem(props.item)"
-        >
-          delete
-        </v-icon>
-      </td>
+        <td>{{ props.item.name }}</td>
+        <td>{{ props.item.NIP }}</td>
+        <td>{{ props.item.gender }}</td>
+        <td>{{ props.item.religion }}</td>
+        <td>{{ props.item.born_place }}</td>
+        <td>{{ props.item.dateborn }}</td>
+        <td>{{ props.item.address }}</td>
+        <td>{{ props.item.phone_number }}</td>
+        <td class="justify-center layout px-0">
+          <v-icon
+            small
+            class="mr-2"
+            @click="editItem(props.index)"
+          >
+            edit
+          </v-icon>
+          <v-icon
+            small
+            class="mr-2"
+            @click="deleteItem(props.item)"
+          >
+            delete
+          </v-icon>
+        </td>
       </template>
     </v-data-table>
+    <v-snackbar
+      :value="errorMsg"
+      :color="color"
+      :multi-line="mode === 'multi-line'"
+      :timeout="timeout"
+      :vertical="mode === 'vertical'"
+    >
+      {{ errorMsg }}
+      <v-btn
+        dark
+        flat
+        @click="removeError()"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -104,12 +119,18 @@
 
 <script>
   import Form from '../../components/Form'
+  import Dialog from '../../components/Dialog'
   export default {
     components: {
-      Form
+      Form,
+      Dialog
     },
     data () {
       return {
+        color: '',
+        mode: '',
+        timeout: 6000,
+        alert: false,
         forminput: {
           imageFile: null,
           name: 'Kristian',
@@ -122,6 +143,7 @@
           phonenumber: '08943429343',
           relationship: 'Single',
         },
+        imageUrl: "",
         total: 0,
         selected: [],
         sortbylast: null,
@@ -132,20 +154,7 @@
         pagination: {},
         dialog: false,
         editedIndex: -1,
-        editedItem: {
-          name: '',
-          calories: 0,
-          fat: 0,
-          carbs: 0,
-          protein: 0
-        },
-        defaultItem: {
-          name: '',
-          calories: 0,
-          fat: 0,
-          carbs: 0,
-          protein: 0
-        },
+        idselected: 0,
         theaders: [
           {text: 'Nama', value: 'name'},
           {text: 'NIP', value: 'NIP'},
@@ -153,31 +162,94 @@
           {text: 'Agama', value: 'religion'},
           {text: 'Tempat Lahir', value: 'born_place'},
           {text: 'Tanggal Lahir', value: 'born_date'},
-          { text: 'Actions', sortable: false }
-        ]
+          {text: 'Alamat', value: 'address'},
+          {text: 'No Telp', value: 'phone_number'},
+          {text: 'Actions', sortable: false }
+        ],
+        currentY: 0,
+        lastY:0
       }
     },
     methods: {
-      editItem () {
+      handleScroll (event) {
+        this.currentY = event.pageY
+        if(this.currentY > this.lastY){
+          this.hidden = true
+        }else{
+          this.hidden = false
+        }
+        this.lastY = this.currentY
       },
-      deleteItem () {
+      removeError(){
+        const {dispatch} = this.$store;
+        dispatch('removeError')
+      },
+      editItem (index) {
+        const {relationship, gender, teacher_id} = this.table[index]
+        this.editedIndex = -1
+        this.forminput = {
+          imageFile: null,
+          name: this.table[index].name,
+          nip: this.table[index].NIP,
+          gender: `${gender.charAt(0).toUpperCase()}${gender.slice(1)}`,
+          religion: this.table[index].religion,
+          bornplace: this.table[index].born_place,
+          borndate: this.table[index].dateborn,
+          address: this.table[index].address,
+          phonenumber: this.table[index].phone_number,
+          relationship: `${relationship.charAt(0).toUpperCase()}${relationship.slice(1)}`,
+        }
+        this.idselected = teacher_id
+        this.imageUrl = `http://localhost:3000/images/uploads/${this.table[index].picture}`
+        this.formTitle = 'Edit Guru'
+        const {dispatch} = this.$store;
+        dispatch('openDialog')
+      },
+      addItem(){
+        this.forminput = {
+          imageFile: null,
+          name: 'Kristian',
+          nip: '023912389123',
+          gender: 'Lelaki',
+          religion: 'Kristen Protestan',
+          bornplace: 'Jakarta',
+          borndate: '',
+          address: 'Tangerang',
+          phonenumber: '08943429343',
+          relationship: 'Single',
+        }
+        this.imageUrl = ''
+        this.editedIndex = 1
+        this.formTitle = 'Tambah Guru'
+        const {dispatch} = this.$store;
+        dispatch('openDialog')
+      },
+      deleteItem (id) {
+        this.alert = true
+        this.idselected = id
+      },
+      OkButton(){
+        const {dispatch} = this.$store;
+        dispatch('deleteTeacher', {id: this.idselected.teacher_id})
+        this.alert = false
+        this.idselected = 0
+      },
+      NoButton(){
+        this.alert = false
       },
       close () {
-        this.dialog = false
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        }, 300)
+        this.idselected = 0
       },
-
+      closeDialog(){
+        const {dispatch} = this.$store;
+        dispatch('closeDialog')
+      },
       save () {
-        // if (this.editedIndex > -1) {
-        //   Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        // } else {
-        //   this.desserts.push(this.editedItem)
-        // }
         if(this.isLoading) return;
         const formData = new FormData()
+        if(this.editedIndex == -1){
+          formData.append('id', this.idselected)
+        }
         formData.append('imgusr', this.forminput.imageFile)
         formData.append('name', this.forminput.name)
         formData.append('nip', this.forminput.nip)
@@ -189,8 +261,12 @@
         formData.append('phoneNumber', this.forminput.phonenumber)
         formData.append('relationship', this.forminput.relationship)
         const {dispatch} = this.$store;
-        dispatch('uploadTeacher', {data: formData})
-        this.close()
+        if(this.editedIndex == -1){
+          dispatch('updateTeacher', {data: formData})
+        }else{
+          dispatch('uploadTeacher', {data: formData})
+        }
+        // this.close()
       },
       getDataFromApi(){
         if(this.isLoading) return;
@@ -212,14 +288,31 @@
       lentable(){
         return this.$store.getters['getLenItems']
       },
+      isUpload(){
+        return this.$store.getters['getStatUpload']
+      },
+      errorMsg(){
+        return this.$store.getters['getError']
+      },
       params(){
           return {
               ...this.pagination,
               query: this.search
           }
+      },
+      dialogActive(){
+        return this.$store.getters['getDialog']
       }
     },
     watch: {
+      dialogActive: {
+        handler(val){
+          if(!val){
+            this.close()
+          }
+        },
+        deep: true
+      },
       pagination: {
         handler () {
           this.getDataFromApi();
@@ -231,10 +324,27 @@
               this.getDataFromApi()
           },
           deep: true
+      },
+      isUpload: {
+        handler(value, valueold){
+          // console.log(value, valueold)
+          // // if(value == valueold)
+          // //   return
+          // console.log(~value&&valueold)
+          if(~value&&valueold)
+            this.getDataFromApi()
+        },
+        deep: true
       }
     },
     mounted () {
       this.getDataFromApi();
     },
+    created () {
+      window.addEventListener('scroll', this.handleScroll);
+    },
+    destroyed () {
+      window.removeEventListener('scroll', this.handleScroll);
+    }
   }
 </script>

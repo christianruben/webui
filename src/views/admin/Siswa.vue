@@ -1,60 +1,47 @@
 <template>
   <v-container>
-    <v-dialog v-model="dialog" max-width="500px">
-    <!-- <template v-slot:activator="{ on }">
-        <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-    </template> -->
+    <v-dialog persistent :value="dialogActive" max-width="600px">
         <v-card>
-            <v-card-title>
+        <v-alert
+          :value="errorMsg"
+          dismissible
+          color="error"
+        >
+          {{errorMsg}}
+        </v-alert>
+          <v-card-title>
             <span class="headline">{{ formTitle }}</span>
-            </v-card-title>
+          </v-card-title>
 
-            <v-card-text>
-            <v-container grid-list-md>
-                <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                    <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
-                </v-flex>
-                </v-layout>
-            </v-container>
-            </v-card-text>
+          <v-card-text>
+            <Form :forminput="forminput" :imageUrl="imageUrl"/>
+          </v-card-text>
 
-            <v-card-actions>
+          <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
+            <v-btn color="blue darken-1" flat @click="closeDialog">Cancel</v-btn>
             <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
-            </v-card-actions>
+          </v-card-actions>
         </v-card>
-    </v-dialog>
-    <v-fab-transition>
+      </v-dialog>
+      <Dialog :dialog="alert" :title="`Hapus data`" :text="`Anda yakin ingin menghapus data ini ?`" v-on:ok="OkButton" v-on:no="NoButton"/>
+      <v-fab-transition>
         <v-btn
         v-show="!hidden"
         color="pink"
         fab
         dark
-        medium
+        small
         fixed
         bottom
         right
-        @click="dialog = true"
+        @click="addItem"
         >
-            <v-icon>add</v-icon>
+          <v-icon>add</v-icon>
         </v-btn>
     </v-fab-transition>
     <v-card-title>
-      Nutrition
+      Table Guru
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -65,7 +52,8 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
-      :headers="headers"
+      v-model="selected"
+      :headers="theaders"
       :items="table"
       :pagination.sync="pagination"
       :total-items="lentable"
@@ -74,93 +62,223 @@
     >
       <template v-slot:items="props">
         <td>{{ props.item.name }}</td>
-        <td class="text-xs-right">{{ props.item.NIP }}</td>
-        <td class="text-xs-right">{{ props.item.gender }}</td>
-        <td class="text-xs-right">{{ props.item.religion }}</td>
-        <td class="text-xs-right">{{ props.item.born_place }}</td>
-        <td class="text-xs-center">{{ props.item.dateborn }}</td>
+        <td>{{ props.item.NIP }}</td>
+        <td>{{ props.item.gender }}</td>
+        <td>{{ props.item.religion }}</td>
+        <td>{{ props.item.born_place }}</td>
+        <td>{{ props.item.dateborn }}</td>
+        <td>{{ props.item.address }}</td>
+        <td>{{ props.item.phone_number }}</td>
         <td class="justify-center layout px-0">
-            <v-icon
+          <v-icon
             small
             class="mr-2"
-            @click="editItem(props.item)"
-            >
+            @click="editItem(props.index)"
+          >
             edit
-            </v-icon>
-            <v-icon
+          </v-icon>
+          <v-icon
             small
+            class="mr-2"
             @click="deleteItem(props.item)"
-            >
+          >
             delete
-            </v-icon>
+          </v-icon>
         </td>
       </template>
     </v-data-table>
+    <v-snackbar
+      :value="errorMsg"
+      :color="color"
+      :multi-line="mode === 'multi-line'"
+      :timeout="timeout"
+      :vertical="mode === 'vertical'"
+    >
+      {{ errorMsg }}
+      <v-btn
+        dark
+        flat
+        @click="removeError()"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
+
+<style>
+  /* This is for documentation purposes and will not be needed in your application */
+  #lateral .v-speed-dial,
+  #lateral .v-btn--floating {
+    position: absolute;
+  }
+  #lateral .v-btn--floating {
+    margin: 32px 32px 16px 16px;
+  }
+</style>
+
 <script>
+  import Form from '../../components/Form'
+  import Dialog from '../../components/Dialog'
   export default {
+    components: {
+      Form,
+      Dialog
+    },
     data () {
       return {
+        color: '',
+        mode: '',
+        timeout: 6000,
+        alert: false,
+        forminput: {
+          imageFile: null,
+          name: 'Kristian',
+          nip: '023912389123',
+          gender: 'Lelaki',
+          religion: 'Kristen Protestan',
+          bornplace: 'Jakarta',
+          borndate: '',
+          address: 'Tangerang',
+          phonenumber: '08943429343',
+          relationship: 'Single',
+        },
+        imageUrl: "",
         total: 0,
         selected: [],
         sortbylast: null,
         search: "",
         loading: false,
-        formTitle: 'Guru',
+        formTitle: 'Input Guru',
         hidden: false,
         pagination: {},
         dialog: false,
         editedIndex: -1,
-        editedItem: {
-          name: '',
-          calories: 0,
-          fat: 0,
-          carbs: 0,
-          protein: 0
-        },
-        defaultItem: {
-          name: '',
-          calories: 0,
-          fat: 0,
-          carbs: 0,
-          protein: 0
-        },
-        headers: [
+        idselected: 0,
+        theaders: [
           {text: 'Nama', value: 'name'},
-          {text: 'NIP', value: 'NIP'},
+          {text: 'NIS', value: 'NIS'},
           {text: 'Kelamin', value: 'gender'},
           {text: 'Agama', value: 'religion'},
           {text: 'Tempat Lahir', value: 'born_place'},
           {text: 'Tanggal Lahir', value: 'born_date'},
-          { text: 'Actions', sortable: false }
-        ]
+          {text: 'Ayah', value: 'father_name'},
+          {text: 'Ibu', value: 'mother_name'},
+          {text: 'Alamat', value: 'address'},
+          {text: 'No Telp', value: 'phone_number'},
+          {text: 'Actions', sortable: false }
+        ],
+        currentY: 0,
+        lastY:0
       }
     },
-    watch: {
-      pagination: {
-        handler () {
-          this.getDataFromApi()
-            // .then(data => {
-            //   this.desserts = data.items
-            //   this.totalDesserts = data.total
-            // })
-        },
-        deep: true
+    methods: {
+      handleScroll (event) {
+        this.currentY = event.pageY
+        if(this.currentY > this.lastY){
+          this.hidden = true
+        }else{
+          this.hidden = false
+        }
+        this.lastY = this.currentY
       },
-      params: {
-          handler(){
-              this.getDataFromApi()
-          },
-          deep: true
+      removeError(){
+        const {dispatch} = this.$store;
+        dispatch('removeError')
+      },
+      editItem (index) {
+        const {relationship, gender, teacher_id} = this.table[index]
+        this.editedIndex = -1
+        this.forminput = {
+          imageFile: null,
+          name: this.table[index].name,
+          nip: this.table[index].NIP,
+          gender: `${gender.charAt(0).toUpperCase()}${gender.slice(1)}`,
+          religion: this.table[index].religion,
+          bornplace: this.table[index].born_place,
+          borndate: this.table[index].dateborn,
+          address: this.table[index].address,
+          phonenumber: this.table[index].phone_number,
+          relationship: `${relationship.charAt(0).toUpperCase()}${relationship.slice(1)}`,
+        }
+        this.idselected = teacher_id
+        this.imageUrl = `http://localhost:3000/images/uploads/${this.table[index].picture}`
+        this.formTitle = 'Edit Siswa'
+        const {dispatch} = this.$store;
+        dispatch('openDialog')
+      },
+      addItem(){
+        this.forminput = {
+          imageFile: null,
+          name: 'Kristian',
+          nip: '023912389123',
+          gender: 'Lelaki',
+          religion: 'Kristen Protestan',
+          bornplace: 'Jakarta',
+          borndate: '',
+          address: 'Tangerang',
+          phonenumber: '08943429343',
+          relationship: 'Single',
+        }
+        this.imageUrl = ''
+        this.editedIndex = 1
+        this.formTitle = 'Tambah Siswa'
+        const {dispatch} = this.$store;
+        dispatch('openDialog')
+      },
+      deleteItem (id) {
+        this.alert = true
+        this.idselected = id
+      },
+      OkButton(){
+        const {dispatch} = this.$store;
+        dispatch('deleteStudent', {id: this.idselected.teacher_id})
+        this.alert = false
+        this.idselected = 0
+      },
+      NoButton(){
+        this.alert = false
+      },
+      close () {
+        this.idselected = 0
+      },
+      closeDialog(){
+        const {dispatch} = this.$store;
+        dispatch('closeDialog')
+      },
+      save () {
+        if(this.isLoading) return;
+        const formData = new FormData()
+        if(this.editedIndex == -1){
+          formData.append('id', this.idselected)
+        }
+        formData.append('imgusr', this.forminput.imageFile)
+        formData.append('name', this.forminput.name)
+        formData.append('nip', this.forminput.nip)
+        formData.append('gender', this.forminput.gender)
+        formData.append('religion', this.forminput.religion)
+        formData.append('bornPlace', this.forminput.bornplace)
+        formData.append('bornDate', this.forminput.borndate)
+        formData.append('address', this.forminput.address)
+        formData.append('phoneNumber', this.forminput.phonenumber)
+        formData.append('relationship', this.forminput.relationship)
+        const {dispatch} = this.$store;
+        if(this.editedIndex == -1){
+          dispatch('updateStudent', {data: formData})
+        }else{
+          dispatch('uploadStudent', {data: formData})
+        }
+        // this.close()
+      },
+      getDataFromApi(){
+        if(this.isLoading) return;
+        const {dispatch} = this.$store;
+        let {sortBy, descending, page, rowsPerPage} = this.pagination
+        if(sortBy){
+          this.sortbylast = sortBy
+        }
+        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
       }
-    },
-    mounted () {
-      this.getDataFromApi();
-        // .then(data => {
-        //   this.desserts = data.items
-        //   this.totalDesserts = data.total
-        // })
     },
     computed: {
       table(){
@@ -172,43 +290,63 @@
       lentable(){
         return this.$store.getters['getLenItems']
       },
+      isUpload(){
+        return this.$store.getters['getStatUpload']
+      },
+      errorMsg(){
+        return this.$store.getters['getError']
+      },
       params(){
           return {
               ...this.pagination,
               query: this.search
           }
+      },
+      dialogActive(){
+        return this.$store.getters['getDialog']
       }
     },
-    methods: {
-      getDataFromApi () {
-        this.loading = true
-        const {dispatch} = this.$store;
-        let {sortBy, descending, page, rowsPerPage} = this.pagination
-        if(sortBy){
-          this.sortbylast = sortBy
-        }
-        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
+    watch: {
+      dialogActive: {
+        handler(val){
+          if(!val){
+            this.close()
+          }
+        },
+        deep: true
       },
-      editItem () {
+      pagination: {
+        handler () {
+          this.getDataFromApi();
+        },
+        deep: true
       },
-      deleteItem () {
+      params: {
+          handler(){
+              this.getDataFromApi()
+          },
+          deep: true
       },
-      close () {
-        this.dialog = false
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        }, 300)
-      },
-
-      save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        } else {
-          this.desserts.push(this.editedItem)
-        }
-        this.close()
+      isUpload: {
+        handler(value, valueold){
+          // console.log(value, valueold)
+          // // if(value == valueold)
+          // //   return
+          // console.log(~value&&valueold)
+          if(~value&&valueold)
+            this.getDataFromApi()
+        },
+        deep: true
       }
+    },
+    mounted () {
+      this.getDataFromApi();
+    },
+    created () {
+      window.addEventListener('scroll', this.handleScroll);
+    },
+    destroyed () {
+      window.removeEventListener('scroll', this.handleScroll);
     }
   }
 </script>

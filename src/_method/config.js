@@ -20,8 +20,8 @@ function getHeadersv2(token){
   return headers
 }
 export const config= {
-    endpoint: "http://192.168.0.102:3000/api",
-    auth: "http://192.168.0.102:3000/authentication",
+    endpoint: "http://localhost:3000/api",
+    auth: "http://localhost:3000/authentication",
     getUrlParams: function(url,params){
       let query = Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
       return `${url}?${query}`;
@@ -30,14 +30,14 @@ export const config= {
 	return {
 		method: 'GET',
 		mode: 'cors',
-		headers: getHeaders(localStorage.getItem('user'))
+		headers: getHeaders(window.$cookies.get('apitoken'))
 	}
     },
     postdataconfig: function(data){
       let result = {
         method: 'POST',
         mode: 'cors',
-        headers: getHeaders(localStorage.getItem('user')),
+        headers: getHeaders(window.$cookies.get('apitoken')),
         body: JSON.stringify(data)
       }
       return result
@@ -46,16 +46,34 @@ export const config= {
       let result = {
         method: 'POST',
         mode: 'cors',
-        headers: getHeadersv2(localStorage.getItem('user')),
+        headers: getHeadersv2(window.$cookies.get('apitoken')),
         body: data
       }
       return result
+    },
+    putdatafile: function(data){
+      let result = {
+        method: 'PUT',
+        mode: 'cors',
+        headers: getHeadersv2(window.$cookies.get('apitoken')),
+        body: data
+      }
+      return result;
     },
     putdataconfig: function(data){
       let result = {
         method: 'PUT',
         mode: 'cors',
-        headers: getHeaders(localStorage.getItem('user')),
+        headers: getHeaders(window.$cookies.get('apitoken')),
+        body: JSON.stringify(data)
+      }
+      return result;
+    },
+    deletedataconfig: function(data){
+      let result = {
+        method: 'DELETE',
+        mode: 'cors',
+        headers: getHeaders(window.$cookies.get('apitoken')),
         body: JSON.stringify(data)
       }
       return result;
@@ -63,16 +81,16 @@ export const config= {
     postconfig: {
         method: 'POST',
         mode: 'cors',
-        headers: getHeaders(localStorage.getItem('user'))
+        headers: getHeaders(window.$cookies.get('apitoken'))
     },
     deleteconfig: {
         method: 'DELETE',
         mode: 'cors',
-        headers: getHeaders(localStorage.getItem('user'))
+        headers: getHeaders(window.$cookies.get('apitoken'))
     },
     putconfig: {
         method: 'PUT',
         mode: 'cors',
-        headers: getHeaders(localStorage.getItem('user'))
+        headers: getHeaders(window.$cookies.get('apitoken'))
     }
 }
