@@ -84,7 +84,7 @@
                 return this.$store.state.authentication.loading;
             },
             errMessage(){
-                return this.$store.state.authentication.errmsg;
+                return this.$store.getters['authentication/getError'];
             },
             getType(){
                 if(this.$route.path.split('/')[1] === 'admin'){

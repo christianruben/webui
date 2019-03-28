@@ -20,8 +20,8 @@ function getHeadersv2(token){
   return headers
 }
 export const config= {
-    endpoint: "http://localhost:3000/api",
-    auth: "http://localhost:3000/authentication",
+    endpoint: "http://192.168.0.102:3000/api",
+    auth: "http://192.168.0.102:3000/authentication",
     getUrlParams: function(url,params){
       let query = Object.keys(params).map(k => `${encodeURIComponent(k)}=${encodeURIComponent(params[k])}`).join('&');
       return `${url}?${query}`;

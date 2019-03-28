@@ -2,6 +2,8 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
 
+// const session = Vue.prototype.$session
+
 Vue.use(Router)
 
 const router = new Router({
@@ -131,33 +133,34 @@ const router = new Router({
 })
 
 function getCookie(cname) {
-  var name = cname + "=";
-  var decodedCookie = decodeURIComponent(document.cookie);
-  var ca = decodedCookie.split(';');
+  var name = cname + "="
+  var decodedCookie = decodeURIComponent(document.cookie)
+  var ca = decodedCookie.split(';')
   for(var i = 0; i <ca.length; i++) {
-    var c = ca[i];
+    var c = ca[i]
     while (c.charAt(0) == ' ') {
-      c = c.substring(1);
+      c = c.substring(1)
     }
     if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
+      let result = c.substring(name.length, c.length)
+      return result
     }
   }
-  return null;
+  return null
 }
 
 router.beforeEach((to, from, next) => {
-  let cookieTOken = getCookie('Token')
-  let cookieIdToken = getCookie('IdToken')
-  if(cookieTOken && cookieIdToken && (cookieIdToken !== "" && cookieTOken !== "")){
-    localStorage.setItem("user", cookieTOken)
-    localStorage.setItem("level", cookieIdToken)
-  }else{
-    localStorage.clear()
-  }
+  // if(session.exists()){
+  //   console.log('token set')
+  //   localStorage.setItem("user", session.get('Token'))
+  //   localStorage.setItem("level", session.get('TokenLvl'))
+  // }else{
+  //   console.log('token remove')
+  //   localStorage.clear()
+  // }
   const publicPages = ['/login'];
   const authRequired = !publicPages.includes(to.path);
-  const isLogged = localStorage.getItem("user");
+  const isLogged = localStorage.getItem("user") 
   const level = localStorage.getItem("level")
   const adminpublicPages = ['/admin/login'];
   const authRequiredAdmin = !adminpublicPages.includes(to.path);

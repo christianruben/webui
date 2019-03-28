@@ -19,11 +19,8 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 1})
                         commit('setLogin')
-                        let d = new Date()
-                        d.setTime(d.getTime() + (1*24*60*60*1000))
-                        let expires = "expires="+ d.toUTCString()
-                        util.setCookie("Token", json.token, expires)
-                        util.setCookie("IdToken", 1, expires)
+                        // Vue.$session.set('Token', json.token)
+                        // Vue.$session.set('TokenLvl', 1)
                         router.push('/')
                     }else{
                         commit('setErrMsg', json.message)
@@ -44,11 +41,8 @@ export const authentication = {
                     if(json.auth){
                         commit('saveUser',{user: json.token, level: 2})
                         commit('setLogin')
-                        let d = new Date()
-                        d.setTime(d.getTime() + (1*24*60*60*1000))
-                        let expires = "expires="+ d.toUTCString()
-                        util.setCookie("Token", json.token, expires)
-                        util.setCookie("IdToken", 2, expires)
+                        // Vue.$session.set('Token', json.token)
+                        // Vue.$session.set('TokenLvl', 2)
                         router.push('/admin')
                     }else{
                         commit('setErrMsg', json.message)
@@ -86,6 +80,9 @@ export const authentication = {
         }
     },
     getters: {
+        getError(state){
+            return state.errmsg
+        },
         isUserLogged(state){
             return state.isLogged
         },
