@@ -14,7 +14,7 @@
           </v-card-title>
 
           <v-card-text>
-            <Form :forminput="forminput" :imageUrl="imageUrl"/>
+            <FormGuru :forminput="forminput" :imageUrl="imageUrl"/>
           </v-card-text>
 
           <v-card-actions>
@@ -62,11 +62,13 @@
     >
       <template v-slot:items="props">
         <td>{{ props.item.name }}</td>
-        <td>{{ props.item.NIP }}</td>
+        <td>{{ props.item.NIS }}</td>
         <td>{{ props.item.gender }}</td>
         <td>{{ props.item.religion }}</td>
         <td>{{ props.item.born_place }}</td>
         <td>{{ props.item.dateborn }}</td>
+        <td>{{ props.item.father_name }}</td>
+        <td>{{ props.item.mother_name }}</td>
         <td>{{ props.item.address }}</td>
         <td>{{ props.item.phone_number }}</td>
         <td class="justify-center layout px-0">
@@ -118,11 +120,11 @@
 </style>
 
 <script>
-  import Form from '../../components/Form'
+  import FormGuru from '../../components/FormGuru'
   import Dialog from '../../components/Dialog'
   export default {
     components: {
-      Form,
+      FormGuru,
       Dialog
     },
     data () {
@@ -134,14 +136,16 @@
         forminput: {
           imageFile: null,
           name: 'Kristian',
-          nip: '023912389123',
+          nis: '023912389123',
           gender: 'Lelaki',
           religion: 'Kristen Protestan',
           bornplace: 'Jakarta',
           borndate: '',
+          fathername: '',
+          mothername: '',
           address: 'Tangerang',
           phonenumber: '08943429343',
-          relationship: 'Single',
+          class: {name:"", id:-1},
         },
         imageUrl: "",
         total: 0,
@@ -184,47 +188,51 @@
       },
       removeError(){
         const {dispatch} = this.$store;
-        dispatch('removeError')
+        dispatch('students/removeError')
       },
       editItem (index) {
-        const {relationship, gender, teacher_id} = this.table[index]
+        const {class_id, class_name, father_name, mother_name, department_id, gender, student_id} = this.table[index]
         this.editedIndex = -1
         this.forminput = {
           imageFile: null,
           name: this.table[index].name,
-          nip: this.table[index].NIP,
+          nis: this.table[index].NIS,
           gender: `${gender.charAt(0).toUpperCase()}${gender.slice(1)}`,
           religion: this.table[index].religion,
           bornplace: this.table[index].born_place,
           borndate: this.table[index].dateborn,
           address: this.table[index].address,
+          fathername: father_name,
+          mothername: mother_name,
           phonenumber: this.table[index].phone_number,
-          relationship: `${relationship.charAt(0).toUpperCase()}${relationship.slice(1)}`,
+          class: {name: class_name, id: class_id, dept: department_id},
         }
-        this.idselected = teacher_id
+        this.idselected = student_id
         this.imageUrl = `http://localhost:3000/images/uploads/${this.table[index].picture}`
         this.formTitle = 'Edit Siswa'
         const {dispatch} = this.$store;
-        dispatch('openDialog')
+        dispatch('students/openDialog')
       },
       addItem(){
         this.forminput = {
           imageFile: null,
           name: 'Kristian',
-          nip: '023912389123',
+          nis: '023912389123',
           gender: 'Lelaki',
           religion: 'Kristen Protestan',
           bornplace: 'Jakarta',
           borndate: '',
+          fathername: '',
+          mothername: '',
           address: 'Tangerang',
           phonenumber: '08943429343',
-          relationship: 'Single',
+          class: {},
         }
         this.imageUrl = ''
         this.editedIndex = 1
         this.formTitle = 'Tambah Siswa'
         const {dispatch} = this.$store;
-        dispatch('openDialog')
+        dispatch('students/openDialog')
       },
       deleteItem (id) {
         this.alert = true
@@ -232,7 +240,7 @@
       },
       OkButton(){
         const {dispatch} = this.$store;
-        dispatch('deleteStudent', {id: this.idselected.teacher_id})
+        dispatch('students/deleteStudent', {id: this.idselected.teacher_id})
         this.alert = false
         this.idselected = 0
       },
@@ -244,7 +252,7 @@
       },
       closeDialog(){
         const {dispatch} = this.$store;
-        dispatch('closeDialog')
+        dispatch('students/closeDialog')
       },
       save () {
         if(this.isLoading) return;
@@ -252,21 +260,24 @@
         if(this.editedIndex == -1){
           formData.append('id', this.idselected)
         }
+        console.log(this.forminput.class.id)
         formData.append('imgusr', this.forminput.imageFile)
         formData.append('name', this.forminput.name)
-        formData.append('nip', this.forminput.nip)
+        formData.append('nis', this.forminput.nis)
         formData.append('gender', this.forminput.gender)
         formData.append('religion', this.forminput.religion)
         formData.append('bornPlace', this.forminput.bornplace)
         formData.append('bornDate', this.forminput.borndate)
+        formData.append('fatherName', this.forminput.fathername)
+        formData.append('motherName', this.forminput.mothername)
         formData.append('address', this.forminput.address)
         formData.append('phoneNumber', this.forminput.phonenumber)
-        formData.append('relationship', this.forminput.relationship)
+        formData.append('classid', this.forminput.class.id)
         const {dispatch} = this.$store;
         if(this.editedIndex == -1){
-          dispatch('updateStudent', {data: formData})
+          dispatch('students/updateStudent', {data: formData})
         }else{
-          dispatch('uploadStudent', {data: formData})
+          dispatch('students/uploadStudent', {data: formData})
         }
         // this.close()
       },
@@ -277,24 +288,24 @@
         if(sortBy){
           this.sortbylast = sortBy
         }
-        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
+        dispatch('students/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
       }
     },
     computed: {
       table(){
-        return this.$store.getters['getAllItems']
+        return this.$store.getters['students/getAllItems']
       },
       isLoading(){
-        return this.$store.getters['getLoading']
+        return this.$store.getters['students/getLoading']
       },
       lentable(){
-        return this.$store.getters['getLenItems']
+        return this.$store.getters['students/getLenItems']
       },
       isUpload(){
-        return this.$store.getters['getStatUpload']
+        return this.$store.getters['students/getStatUpload']
       },
       errorMsg(){
-        return this.$store.getters['getError']
+        return this.$store.getters['students/getError']
       },
       params(){
           return {
@@ -303,7 +314,7 @@
           }
       },
       dialogActive(){
-        return this.$store.getters['getDialog']
+        return this.$store.getters['students/getDialog']
       }
     },
     watch: {
@@ -340,6 +351,7 @@
       }
     },
     mounted () {
+      console.log(this.$store)
       this.getDataFromApi();
     },
     created () {

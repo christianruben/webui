@@ -19,9 +19,9 @@
       required
     ></v-text-field>
     <v-text-field
-      v-model="forminput.nip"
+      v-model="forminput.nis"
       :counter="20"
-      label="NIP"
+      label="NIS"
       required
     ></v-text-field>
     <v-select
@@ -73,6 +73,20 @@
         required
       ></v-date-picker>
     </v-menu>
+    <v-text-field
+      v-model="forminput.fathername"
+      :counter="50"
+      label="Nama Ayah"
+      data-vv-name="name"
+      required
+    ></v-text-field>
+    <v-text-field
+      v-model="forminput.mothername"
+      :counter="50"
+      label="Nama Ibu"
+      data-vv-name="name"
+      required
+    ></v-text-field>
     <v-textarea
       :counter="50"
       label="Alamat"
@@ -86,10 +100,14 @@
       required
     ></v-text-field>
     <v-select
-      v-model="forminput.relationship"
-      :items="relationshiplist"
-      label="Hubungan"
-      required
+      v-model="forminput.class"
+      :items="classselect"
+      item-text="name"
+      item-value="id"
+      label="Kelas"
+      persistent-hint
+      return-object
+      single-line
     ></v-select>
   </form>
 </template>
@@ -103,7 +121,6 @@
       menu: false,
       genderlist: ['Lelaki', 'Perempuan'],
       religionlist: ['Islam', 'Kristen Protestan', 'Katolik', 'Buddha', 'Hindu', 'Kong Hu Cu'],
-      relationshiplist: ['Single', 'Single Parent', 'Married'],
       dialog: false,
       imageName: ''
     }),
@@ -132,6 +149,14 @@
           this.forminput.imageFile = ''
           this.imageUrl = ''
         }
+      }
+    },
+    computed: {
+      classselect () {
+        return this.$store.getters['students/getClassList']
+      },
+      selected(){
+        return this.classselect[this.forminput.class]
       }
     },
     watch: {

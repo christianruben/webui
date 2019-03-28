@@ -32,6 +32,7 @@ export const students = {
             commit('setLoading', true)
             commit('setUpload', true)
             student.insert(data, (result)=>{
+                console.log('insert data')
                 const {err, json} = result;
                 if(err){
                     commit('setError', err)
@@ -87,7 +88,7 @@ export const students = {
             commit('setLoading', false)
         },
         storeClass({commit}){
-            // window.$cookies.remove('clsmod')
+            window.$cookies.remove('clsmod')
             if(window.$cookies.isKey('clsmod')){
                 const list = window.$cookies.get('clsmod')
                 commit('setClass', list)
@@ -139,7 +140,7 @@ export const students = {
     },
     mutations: {
         setClass(state, items){
-            state.classItems = items
+            state.classItems = JSON.parse(items)
             if(!window.$cookies.isKey('clsmod')){
                 window.$cookies.set('clsmod', items, 60 * 60 * 24 * 30)
             }
