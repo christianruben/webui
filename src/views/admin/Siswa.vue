@@ -260,7 +260,6 @@
         if(this.editedIndex == -1){
           formData.append('id', this.idselected)
         }
-        console.log(this.forminput.class.id)
         formData.append('imgusr', this.forminput.imageFile)
         formData.append('name', this.forminput.name)
         formData.append('nis', this.forminput.nis)
@@ -351,7 +350,6 @@
       }
     },
     mounted () {
-      console.log(this.$store)
       this.getDataFromApi();
     },
     created () {

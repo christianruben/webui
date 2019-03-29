@@ -112,7 +112,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Pelajaran'
       },
-      component: () => import(/* webpackChunkName: "pelajaran" */'./views/admin/Admin.vue')
+      component: () => import(/* webpackChunkName: "pelajaran" */'./views/admin/Pelajaran.vue')
     },
     {
       path: '/admin/kelas',

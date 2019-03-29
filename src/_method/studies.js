@@ -8,8 +8,32 @@ async function list({index, rows, search, sortby, sort}, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/teacher`, 
+                `${config.endpoint}/study`, 
                 {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
+                ),
+            config.getconfig())
+        let json = await response.json()
+        if(response.status == 200){
+            result.json = json.response
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
+}
+
+async function lightsrc(search, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    try{
+        let response = await fetch(
+            config.getUrlParams(
+                `${config.endpoint}/study/light`, 
+                {search: search}
                 ),
             config.getconfig())
         let json = await response.json()
@@ -30,7 +54,7 @@ async function insert(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/teacher`, config.postdatafile(data))
+        let response = await fetch(`${config.endpoint}/study`, config.postdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -49,7 +73,7 @@ async function del(id, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/teacher`, config.deletedataconfig({id: id}))
+        let response = await fetch(`${config.endpoint}/study`, config.deletedataconfig({id: id}))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -68,34 +92,10 @@ async function update(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/teacher`, config.putdatafile(data))
+        let response = await fetch(`${config.endpoint}/study`, config.putdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
-        }else{
-            result.err = json.message
-        }
-    }catch(err){
-        result.err = err
-    }
-    callback(result)
-}
-
-async function lightsrc(search, callback){
-    let result = {
-        json: null,
-        err: null
-    }
-    try{
-        let response = await fetch(
-            config.getUrlParams(
-                `${config.endpoint}/teacher/light`, 
-                {search: search}
-                ),
-            config.getconfig())
-        let json = await response.json()
-        if(response.status == 200){
-            result.json = json.response
         }else{
             result.err = json.message
         }
@@ -121,7 +121,7 @@ function upload(data, callback){
     });
 }
 
-export const teacher = {
+export const study = {
     list,
     insert,
     del,

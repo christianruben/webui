@@ -8,7 +8,8 @@ export const teachers = {
         totalItems: 0,
         loading: false,
         upload: false,
-        dialog: false
+        dialog: false,
+        lightSearch: []
     },
     actions: {
         storeReq({commit}, {index, rows, search, sortby, sort}){
@@ -25,6 +26,14 @@ export const teachers = {
                     commit('setLoading', false)
                 }, 100)
             })
+        },
+        searchLight({commit}, search){
+            teacher.lightsrc(search, (result)=>{
+                const {json} = result
+                setTimeout(()=>{
+                    commit('addLightData', json)
+                },100)
+            });
         },
         uploadTeacher({commit}, {data}) {
             commit('removeError')
@@ -113,6 +122,9 @@ export const teachers = {
         },
         getDialog(state){
             return state.dialog
+        },
+        getLightResult(state){
+            return state.lightSearch
         }
     },
     mutations: {
@@ -130,6 +142,9 @@ export const teachers = {
         },
         removeError(state){
             state.error = null
+        },
+        addLightData(state, items){
+            state.lightSearch = items
         },
         addAll(state, {items, len}){
             state.listItems = items

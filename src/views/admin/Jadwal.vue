@@ -1,60 +1,47 @@
 <template>
   <v-container>
-    <v-dialog v-model="dialog" max-width="500px">
-        <!-- <template v-slot:activator="{ on }">
-          <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
-        </template> -->
+    <v-dialog persistent :value="dialogActive" max-width="600px">
         <v-card>
+        <v-alert
+          :value="errorMsg"
+          dismissible
+          color="error"
+        >
+          {{errorMsg}}
+        </v-alert>
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
           </v-card-title>
 
           <v-card-text>
-            <v-container grid-list-md>
-              <v-layout wrap>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.name" label="Dessert name"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.calories" label="Calories"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.fat" label="Fat (g)"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.carbs" label="Carbs (g)"></v-text-field>
-                </v-flex>
-                <v-flex xs12 sm6 md4>
-                  <v-text-field v-model="editedItem.protein" label="Protein (g)"></v-text-field>
-                </v-flex>
-              </v-layout>
-            </v-container>
+            <FormSchedule/>
           </v-card-text>
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-            <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+            <v-btn color="red darken-1" flat @click="closeDialog">Cancel</v-btn>
+            <v-btn color="green darken-1" flat @click="save">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
+      <Dialog :dialog="alert" :title="`Hapus data`" :text="`Anda yakin ingin menghapus data ini ?`" v-on:ok="OkButton" v-on:no="NoButton"/>
       <v-fab-transition>
         <v-btn
         v-show="!hidden"
         color="pink"
         fab
         dark
-        medium
+        small
         fixed
         bottom
         right
-        @click="dialog = true"
+        @click="addItem"
         >
           <v-icon>add</v-icon>
         </v-btn>
     </v-fab-transition>
     <v-card-title>
-      Nutrition
+      Table Guru
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -72,40 +59,44 @@
       :total-items="lentable"
       :loading="isLoading"
       class="elevation-1"
-      item-key="name"
-      select-all
     >
       <template v-slot:items="props">
-      <td>
-        <v-checkbox
-          v-model="props.selected"
-          primary
-          hide-details
-        ></v-checkbox>
-      </td>
-      <td>{{ props.item.name }}</td>
-      <td>{{ props.item.NIP }}</td>
-      <td>{{ props.item.gender }}</td>
-      <td>{{ props.item.religion }}</td>
-      <td>{{ props.item.born_place }}</td>
-      <td>{{ props.item.dateborn }}</td>
-      <td class="justify-center layout px-0">
-        <v-icon
-          small
-          class="mr-2"
-          @click="editItem(props.item)"
-        >
-          edit
-        </v-icon>
-        <v-icon
-          small
-          @click="deleteItem(props.item)"
-        >
-          delete
-        </v-icon>
-      </td>
+        <td>{{ props.item.study_name }}</td>
+        <td>{{ props.item.study_code }}</td>
+        <td class="justify-center layout px-0">
+          <v-icon
+            small
+            class="mr-2"
+            @click="editItem(props.index)"
+          >
+            edit
+          </v-icon>
+          <v-icon
+            small
+            class="mr-2"
+            @click="deleteItem(props.item)"
+          >
+            delete
+          </v-icon>
+        </td>
       </template>
     </v-data-table>
+    <v-snackbar
+      :value="errorMsg"
+      :color="color"
+      :multi-line="mode === 'multi-line'"
+      :timeout="timeout"
+      :vertical="mode === 'vertical'"
+    >
+      {{ errorMsg }}
+      <v-btn
+        dark
+        flat
+        @click="removeError()"
+      >
+        Close
+      </v-btn>
+    </v-snackbar>
   </v-container>
 </template>
 
@@ -121,64 +112,121 @@
 </style>
 
 <script>
+  import FormSchedule from '../../components/FormSchedule'
+  import Dialog from '../../components/Dialog'
   export default {
+    components: {
+      FormSchedule,
+      Dialog
+    },
     data () {
       return {
+        valid: false,
+        color: '',
+        mode: '',
+        timeout: 6000,
+        alert: false,
+        forminput: {
+          studyname: "",
+          studycode: ""
+        },
+        imageUrl: "",
         total: 0,
         selected: [],
         sortbylast: null,
         search: "",
         loading: false,
-        formTitle: 'Guru',
+        formTitle: 'Input Guru',
         hidden: false,
         pagination: {},
         dialog: false,
         editedIndex: -1,
-        editedItem: {
-          name: '',
-          calories: 0,
-          fat: 0,
-          carbs: 0,
-          protein: 0
-        },
-        defaultItem: {
-          name: '',
-          calories: 0,
-          fat: 0,
-          carbs: 0,
-          protein: 0
-        },
+        idselected: 0,
         theaders: [
-          {text: 'Nama', value: 'name'},
-          {text: 'NIP', value: 'NIP'},
-          {text: 'Kelamin', value: 'gender'},
-          {text: 'Agama', value: 'religion'},
-          {text: 'Tempat Lahir', value: 'born_place'},
-          {text: 'Tanggal Lahir', value: 'born_date'},
-          { text: 'Actions', sortable: false }
-        ]
+          {text: 'Nama Pelajaran', value: 'study_name'},
+          {text: 'Kode Pelajaran', value: 'study_code'},
+          {text: 'Actions', align: 'center', sortable: false }
+        ],
+        currentY: 0,
+        lastY:0
       }
     },
     methods: {
-      editItem () {
+      handleScroll (event) {
+        this.currentY = event.pageY
+        if(this.currentY > this.lastY){
+          this.hidden = true
+        }else{
+          this.hidden = false
+        }
+        this.lastY = this.currentY
       },
-      deleteItem () {
+      removeError(){
+        const {dispatch} = this.$store;
+        dispatch('studies/removeError')
+      },
+      editItem (index) {
+        const {study_name, study_code} = this.table[index]
+        console.log(study_name, study_code)
+        this.editedIndex = -1
+        this.forminput = {
+          studyname: study_name,
+          studycode: study_code,
+        }
+        this.idselected = this.table[index]
+        this.formTitle = 'Edit Pelajaran'
+        const {dispatch} = this.$store;
+        dispatch('studies/openDialog')
+      },
+      addItem(){
+        this.forminput = {
+          studyname: "",
+          studycode: "",
+        }
+        this.imageUrl = ''
+        this.editedIndex = 1
+        this.formTitle = 'Tambah Pelajaran'
+        const {dispatch} = this.$store;
+        dispatch('studies/openDialog')
+      },
+      deleteItem (id) {
+        this.alert = true
+        this.idselected = id
+      },
+      OkButton(){
+        const {dispatch} = this.$store;
+        dispatch('studies/deleteStudy', {id: this.idselected.study_id})
+        this.alert = false
+        this.idselected = 0
+      },
+      NoButton(){
+        this.alert = false
       },
       close () {
-        this.dialog = false
-        setTimeout(() => {
-          this.editedItem = Object.assign({}, this.defaultItem)
-          this.editedIndex = -1
-        }, 300)
+        this.idselected = 0
       },
-
+      closeDialog(){
+        const {dispatch} = this.$store;
+        dispatch('studies/closeDialog')
+      },
       save () {
-        if (this.editedIndex > -1) {
-          Object.assign(this.desserts[this.editedIndex], this.editedItem)
-        } else {
-          this.desserts.push(this.editedItem)
+        if(this.$refs.form.$refs.form.validate()){
+        // if(this.$children.$refs.form.validate()){
+          if(this.isLoading) return;
+          let data = {};
+          if(this.editedIndex == -1){
+            data.id = this.idselected.study_id
+          }
+          data.studyname = this.forminput.studyname
+          data.studycode = this.forminput.studycode
+          const {dispatch} = this.$store;
+          if(this.editedIndex == -1){
+            dispatch('studies/updateStudy', {data: data})
+          }else{
+            dispatch('studies/uploadStudy', {data: data})
+          }
         }
-        this.close()
+        // this.close()
       },
       getDataFromApi(){
         if(this.isLoading) return;
@@ -187,27 +235,44 @@
         if(sortBy){
           this.sortbylast = sortBy
         }
-        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
+        dispatch('studies/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
       }
     },
     computed: {
       table(){
-        return this.$store.getters['getAllItems']
+        return this.$store.getters['studies/getAllItems']
       },
       isLoading(){
-        return this.$store.getters['getLoading']
+        return this.$store.getters['studies/getLoading']
       },
       lentable(){
-        return this.$store.getters['getLenItems']
+        return this.$store.getters['studies/getLenItems']
+      },
+      isUpload(){
+        return this.$store.getters['studies/getStatUpload']
+      },
+      errorMsg(){
+        return this.$store.getters['studies/getError']
       },
       params(){
           return {
               ...this.pagination,
               query: this.search
           }
+      },
+      dialogActive(){
+        return this.$store.getters['studies/getDialog']
       }
     },
     watch: {
+      dialogActive: {
+        handler(val){
+          if(!val){
+            this.close()
+          }
+        },
+        deep: true
+      },
       pagination: {
         handler () {
           this.getDataFromApi();
@@ -219,10 +284,23 @@
               this.getDataFromApi()
           },
           deep: true
+      },
+      isUpload: {
+        handler(value, valueold){
+          if(~value&&valueold)
+            this.getDataFromApi()
+        },
+        deep: true
       }
     },
     mounted () {
       this.getDataFromApi();
     },
+    created () {
+      window.addEventListener('scroll', this.handleScroll);
+    },
+    destroyed () {
+      window.removeEventListener('scroll', this.handleScroll);
+    }
   }
 </script>

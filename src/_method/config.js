@@ -27,11 +27,11 @@ export const config= {
       return `${url}?${query}`;
     },
     getconfig: function(){
-	return {
-		method: 'GET',
-		mode: 'cors',
-		headers: getHeaders(window.$cookies.get('apitoken'))
-	}
+      return {
+        method: 'GET',
+        mode: 'cors',
+        headers: getHeaders(window.$cookies.get('apitoken'))
+      }
     },
     postdataconfig: function(data){
       let result = {

@@ -327,10 +327,6 @@
       },
       isUpload: {
         handler(value, valueold){
-          // console.log(value, valueold)
-          // // if(value == valueold)
-          // //   return
-          // console.log(~value&&valueold)
           if(~value&&valueold)
             this.getDataFromApi()
         },

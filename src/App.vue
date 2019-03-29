@@ -165,7 +165,7 @@ export default {
   beforeCreate(){
     this.$store.dispatch('header/switchOn')
   },
-  created() {
+  mounted() {
     const {dispatch} = this.$store
     dispatch('students/storeClass')
   },

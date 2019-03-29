@@ -1,5 +1,5 @@
 <template>
-  <form>
+  <v-form v-model="valid" ref="form">
     <v-flex xs12 class="text-xs-center text-sm-center text-md-center text-lg-center">
       <img :src="imageUrl" height="150" v-if="imageUrl"/>
       <v-text-field label="Select Image" @click='pickFile' v-model='imageName' prepend-icon='attach_file'></v-text-field>
@@ -21,6 +21,7 @@
     <v-text-field
       v-model="forminput.nip"
       :counter="20"
+      v-on:keypress="isNumber"
       label="NIP"
       required
     ></v-text-field>
@@ -91,7 +92,7 @@
       label="Hubungan"
       required
     ></v-select>
-  </form>
+  </v-form>
 </template>
 <script>
   export default {
@@ -100,6 +101,7 @@
       imageUrl: String
     },
     data: () => ({
+      valid: false,
       menu: false,
       genderlist: ['Lelaki', 'Perempuan'],
       religionlist: ['Islam', 'Kristen Protestan', 'Katolik', 'Buddha', 'Hindu', 'Kong Hu Cu'],
@@ -108,6 +110,15 @@
       imageName: ''
     }),
     methods: {
+      isNumber: function(evt) {
+          evt = (evt) ? evt : window.event;
+          var charCode = (evt.which) ? evt.which : evt.keyCode;
+          if ((charCode > 31 && (charCode < 48 || charCode > 57)) && charCode !== 46) {
+              evt.preventDefault();;
+          } else {
+              return true;
+          }
+      },
       save (date) {
         this.$refs.menu.save(date)
       },

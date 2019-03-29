@@ -1,6 +1,6 @@
-import {student} from '../_method'
+import {study} from '../_method'
 
-export const students = {
+export const studies = {
     namespaced: true,
     state: {
         listItems: [],
@@ -9,13 +9,14 @@ export const students = {
         totalItems: 0,
         loading: false,
         upload: false,
-        dialog: false
+        dialog: false,
+        lightSearch: []
     },
     actions: {
         storeReq({commit}, {index, rows, search, sortby, sort}){
             commit('removeError')
             commit('setLoading', true)
-            student.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
+            study.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
                 const {err, json} = result;
                 setTimeout(()=>{
                     if(err){
@@ -27,12 +28,19 @@ export const students = {
                 }, 100)
             })
         },
-        uploadStudent({commit}, {data}) {
+        searchLight({commit}, search){
+            study.lightsrc(search, (result)=>{
+                const {json} = result
+                setTimeout(()=>{
+                    commit('addLightData', json)
+                },100)
+            });
+        },
+        uploadStudy({commit}, {data}) {
             commit('removeError')
             commit('setLoading', true)
             commit('setUpload', true)
-            student.insert(data, (result)=>{
-                console.log('insert data')
+            study.insert(data, (result)=>{
                 const {err, json} = result;
                 if(err){
                     commit('setError', err)
@@ -46,11 +54,11 @@ export const students = {
             })
             commit('setLoading', false)
         },
-        updateStudent({commit}, {data}){
+        updateStudy({commit}, {data}){
             commit('removeError')
             commit('setLoading', true)
             commit('setUpload', true)
-            student.update(data, (result)=>{
+            study.update(data, (result)=>{
                 const {err, json} = result;
                 if(err){
                     commit('setError', err)
@@ -70,11 +78,11 @@ export const students = {
         deleteItems({commit}, {id}){
             commit('deleteItems', {id})
         },
-        deleteStudent({commit}, {id}){
+        deleteStudy({commit}, {id}){
             commit('removeError')
             commit('setLoading', true)
             commit('setUpload', true)
-            student.del(id, result=>{
+            study.del(id, result=>{
                 const {err, json} = result
                 if(err){
                     commit('setError', err)
@@ -94,7 +102,7 @@ export const students = {
                 commit('setClass', list)
                 return
             }
-            student.classList(result=>{
+            study.classList(result=>{
                 const {err, json} = result
                 if(err){
                     commit('setError', err)
@@ -136,6 +144,9 @@ export const students = {
         },
         getClassList(state){
             return state.classItems
+        },
+        getLightResult(state){
+            return state.lightSearch
         }
     },
     mutations: {
@@ -159,6 +170,9 @@ export const students = {
         },
         removeError(state){
             state.error = null
+        },
+        addLightData(state, items){
+            state.lightSearch = items
         },
         addAll(state, {items, len}){
             state.listItems = items

@@ -15,7 +15,7 @@
           <v-spacer></v-spacer>
 
           <v-btn
-            color="green darken-1"
+            color="red darken-1"
             flat="flat"
             @click="$emit('no')"
           >
