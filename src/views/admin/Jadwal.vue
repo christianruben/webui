@@ -14,7 +14,7 @@
           </v-card-title>
 
           <v-card-text>
-            <FormSchedule/>
+            <FormSchedule :forminput="forminput"/>
           </v-card-text>
 
           <v-card-actions>
@@ -62,7 +62,10 @@
     >
       <template v-slot:items="props">
         <td>{{ props.item.study_name }}</td>
-        <td>{{ props.item.study_code }}</td>
+        <td>{{ props.item.teacher }}</td>
+        <td>{{ props.item.day_name }}</td>
+        <td>{{ props.item.class_name }}</td>
+        <td>{{ props.item.time_start }} - {{ props.item.time_end }}</td>
         <td class="justify-center layout px-0">
           <v-icon
             small
@@ -144,7 +147,10 @@
         idselected: 0,
         theaders: [
           {text: 'Nama Pelajaran', value: 'study_name'},
-          {text: 'Kode Pelajaran', value: 'study_code'},
+          {text: 'Guru', value: 'teacher'},
+          {text: 'Hari', value: 'day_name'},
+          {text: 'Kelas', value: 'class_name'},
+          {text: 'Jam pelajaran', sortable: false},
           {text: 'Actions', align: 'center', sortable: false }
         ],
         currentY: 0,
@@ -163,7 +169,7 @@
       },
       removeError(){
         const {dispatch} = this.$store;
-        dispatch('studies/removeError')
+        dispatch('schedules/removeError')
       },
       editItem (index) {
         const {study_name, study_code} = this.table[index]
@@ -176,7 +182,7 @@
         this.idselected = this.table[index]
         this.formTitle = 'Edit Pelajaran'
         const {dispatch} = this.$store;
-        dispatch('studies/openDialog')
+        dispatch('schedules/openDialog')
       },
       addItem(){
         this.forminput = {
@@ -187,7 +193,7 @@
         this.editedIndex = 1
         this.formTitle = 'Tambah Pelajaran'
         const {dispatch} = this.$store;
-        dispatch('studies/openDialog')
+        dispatch('schedules/openDialog')
       },
       deleteItem (id) {
         this.alert = true
@@ -195,7 +201,7 @@
       },
       OkButton(){
         const {dispatch} = this.$store;
-        dispatch('studies/deleteStudy', {id: this.idselected.study_id})
+        dispatch('schedules/deleteStudy', {id: this.idselected.study_id})
         this.alert = false
         this.idselected = 0
       },
@@ -207,7 +213,7 @@
       },
       closeDialog(){
         const {dispatch} = this.$store;
-        dispatch('studies/closeDialog')
+        dispatch('schedules/closeDialog')
       },
       save () {
         if(this.$refs.form.$refs.form.validate()){
@@ -221,9 +227,9 @@
           data.studycode = this.forminput.studycode
           const {dispatch} = this.$store;
           if(this.editedIndex == -1){
-            dispatch('studies/updateStudy', {data: data})
+            dispatch('schedules/updateStudy', {data: data})
           }else{
-            dispatch('studies/uploadStudy', {data: data})
+            dispatch('schedules/uploadStudy', {data: data})
           }
         }
         // this.close()
@@ -235,24 +241,24 @@
         if(sortBy){
           this.sortbylast = sortBy
         }
-        dispatch('studies/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
+        dispatch('schedules/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
       }
     },
     computed: {
       table(){
-        return this.$store.getters['studies/getAllItems']
+        return this.$store.getters['schedules/getAllItems']
       },
       isLoading(){
-        return this.$store.getters['studies/getLoading']
+        return this.$store.getters['schedules/getLoading']
       },
       lentable(){
-        return this.$store.getters['studies/getLenItems']
+        return this.$store.getters['schedules/getLenItems']
       },
       isUpload(){
-        return this.$store.getters['studies/getStatUpload']
+        return this.$store.getters['schedules/getStatUpload']
       },
       errorMsg(){
-        return this.$store.getters['studies/getError']
+        return this.$store.getters['schedules/getError']
       },
       params(){
           return {
@@ -261,7 +267,7 @@
           }
       },
       dialogActive(){
-        return this.$store.getters['studies/getDialog']
+        return this.$store.getters['schedules/getDialog']
       }
     },
     watch: {

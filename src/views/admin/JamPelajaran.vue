@@ -12,11 +12,9 @@
           <v-card-title>
             <span class="headline">{{ formTitle }}</span>
           </v-card-title>
-
           <v-card-text>
-            <FormStudy :forminput="forminput" ref="form"/>
+            <FormTime :forminput="forminput" ref="form"/>
           </v-card-text>
-
           <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn color="red darken-1" flat @click="closeDialog">Cancel</v-btn>
@@ -61,8 +59,9 @@
       class="elevation-1"
     >
       <template v-slot:items="props">
-        <td>{{ props.item.study_name }}</td>
-        <td>{{ props.item.study_code }}</td>
+        <td>{{ props.item.time_name }}</td>
+        <td>{{ props.item.time_start }}</td>
+        <td>{{ props.item.time_end }}</td>
         <td class="justify-center layout px-0">
           <v-icon
             small
@@ -112,11 +111,11 @@
 </style>
 
 <script>
-  import FormStudy from '../../components/FormStudy'
+  import FormTime from '../../components/FormTime'
   import Dialog from '../../components/Dialog'
   export default {
     components: {
-      FormStudy,
+      FormTime,
       Dialog
     },
     data () {
@@ -127,8 +126,9 @@
         timeout: 6000,
         alert: false,
         forminput: {
-          studyname: "",
-          studycode: ""
+          timename: "",
+          timestart: null,
+          timeend: null,
         },
         imageUrl: "",
         total: 0,
@@ -143,8 +143,9 @@
         editedIndex: -1,
         idselected: 0,
         theaders: [
-          {text: 'Nama Pelajaran', value: 'study_name'},
-          {text: 'Kode Pelajaran', value: 'study_code'},
+          {text: 'Jam Pelajaran', value: 'time_name'},
+          {text: 'Jam Mulai', value: 'time_start'},
+          {text: 'Jam Berakhir', value: 'time_end'},
           {text: 'Actions', align: 'center', sortable: false }
         ],
         currentY: 0,
@@ -163,31 +164,32 @@
       },
       removeError(){
         const {dispatch} = this.$store;
-        dispatch('studies/removeError')
+        dispatch('times/removeError')
       },
       editItem (index) {
-        const {study_name, study_code} = this.table[index]
-        console.log(study_name, study_code)
+        const {time_name, time_start, time_end} = this.table[index]
         this.editedIndex = -1
         this.forminput = {
-          studyname: study_name,
-          studycode: study_code,
+          timename: time_name,
+          timestart: time_start,
+          timeend: time_end,
         }
         this.idselected = this.table[index]
-        this.formTitle = 'Edit Pelajaran'
+        this.formTitle = 'Edit Jam Pelajaran'
         const {dispatch} = this.$store;
-        dispatch('studies/openDialog')
+        dispatch('times/openDialog')
       },
       addItem(){
         this.forminput = {
-          studyname: "",
-          studycode: "",
+          timename: "",
+          timestart: null,
+          timeend: null,
         }
         this.imageUrl = ''
         this.editedIndex = 1
-        this.formTitle = 'Tambah Pelajaran'
+        this.formTitle = 'Tambah Jam Pelajaran'
         const {dispatch} = this.$store;
-        dispatch('studies/openDialog')
+        dispatch('times/openDialog')
       },
       deleteItem (id) {
         this.alert = true
@@ -195,7 +197,7 @@
       },
       OkButton(){
         const {dispatch} = this.$store;
-        dispatch('studies/deleteStudy', {id: this.idselected.study_id})
+        dispatch('times/deleteTime', {id: this.idselected.study_id})
         this.alert = false
         this.idselected = 0
       },
@@ -207,7 +209,7 @@
       },
       closeDialog(){
         const {dispatch} = this.$store;
-        dispatch('studies/closeDialog')
+        dispatch('times/closeDialog')
       },
       save () {
         if(this.$refs.form.$refs.form.validate()){
@@ -221,9 +223,9 @@
           data.studycode = this.forminput.studycode
           const {dispatch} = this.$store;
           if(this.editedIndex == -1){
-            dispatch('studies/updateStudy', {data: data})
+            dispatch('times/updateTime', {data: data})
           }else{
-            dispatch('studies/uploadStudy', {data: data})
+            dispatch('times/uploadTime', {data: data})
           }
         }
         // this.close()
@@ -235,24 +237,24 @@
         if(sortBy){
           this.sortbylast = sortBy
         }
-        dispatch('studies/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
+        dispatch('times/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
       }
     },
     computed: {
       table(){
-        return this.$store.getters['studies/getAllItems']
+        return this.$store.getters['times/getAllItems']
       },
       isLoading(){
-        return this.$store.getters['studies/getLoading']
+        return this.$store.getters['times/getLoading']
       },
       lentable(){
-        return this.$store.getters['studies/getLenItems']
+        return this.$store.getters['times/getLenItems']
       },
       isUpload(){
-        return this.$store.getters['studies/getStatUpload']
+        return this.$store.getters['times/getStatUpload']
       },
       errorMsg(){
-        return this.$store.getters['studies/getError']
+        return this.$store.getters['times/getError']
       },
       params(){
           return {
@@ -261,7 +263,7 @@
           }
       },
       dialogActive(){
-        return this.$store.getters['studies/getDialog']
+        return this.$store.getters['times/getDialog']
       }
     },
     watch: {

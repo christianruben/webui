@@ -1,34 +1,38 @@
 <template>
   <v-app>
-    <v-toolbar v-if="auth"
-      fixed
-      app>
-      <v-toolbar-side-icon v-if="!drawer" @click="drawer = !drawer"></v-toolbar-side-icon>
-      <v-toolbar-title>{{ $route.meta.title }}</v-toolbar-title>
-      <v-spacer></v-spacer>
-      <v-menu bottom left>
-        <v-btn
-          slot="activator"
-          light
-          icon
-        >
-          <v-icon>more_vert</v-icon>
-        </v-btn>
-
-        <v-list>
-          <v-list-tile
-            v-for="(item, i) in menuItems"
-            :key="i"
-            ripple
-            @click="optionClick(item.id)"
+    <transition name="component-fade" mode="out-in">
+      <v-toolbar v-if="auth"
+        fixed
+        app>
+        <v-toolbar-side-icon v-if="!drawer" @click="drawer = !drawer"></v-toolbar-side-icon>
+        <v-toolbar-title>{{ $route.meta.title }}</v-toolbar-title>
+        <v-spacer></v-spacer>
+        <v-menu bottom left>
+          <v-btn
+            slot="activator"
+            light
+            icon
           >
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile>
-        </v-list>
-      </v-menu>
-    </v-toolbar>
+            <v-icon>more_vert</v-icon>
+          </v-btn>
+
+          <v-list>
+            <v-list-tile
+              v-for="(item, i) in menuItems"
+              :key="i"
+              ripple
+              @click="optionClick(item.id)"
+            >
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile>
+          </v-list>
+        </v-menu>
+      </v-toolbar>
+    </transition>
     <v-content>
+      <transition name="component-fade" mode="out-in">
         <router-view></router-view>
+      </transition>
       <div v-if="loadpage" class="text-xs-center">
         <v-progress-circular
           :size="50"
@@ -37,59 +41,82 @@
         ></v-progress-circular>
       </div>
     </v-content>
-    <v-navigation-drawer
-      v-if="auth"
-      v-model="drawer"
-      app
-    >
-      <v-list class="pa-1">
-        <v-list-tile avatar @click="dialog=true">
-          <v-list-tile-avatar>
-            <img src="https://randomuser.me/api/portraits/men/85.jpg">
-          </v-list-tile-avatar>
-          <v-list-tile-content>
-            <v-list-tile-title>John Leider</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-      <v-list v-if="getLevel == 2" class="pt-0" dense>
-        <v-divider></v-divider>
-        <v-list-group
-          prepend-icon="account_circle"
-          value="false"
-        >
-          <v-list-tile slot="activator">
-            <v-list-tile-title>Data Master</v-list-tile-title>
+    <transition name="component-fade" mode="out-in">
+      <v-navigation-drawer
+        v-if="auth"
+        v-model="drawer"
+        app
+      >
+        <v-list class="pa-1">
+          <v-list-tile avatar @click="showProfile">
+            <v-list-tile-avatar>
+              <img src="https://randomuser.me/api/portraits/men/85.jpg">
+            </v-list-tile-avatar>
+            <v-list-tile-content>
+              <v-list-tile-title>John Leider</v-list-tile-title>
+            </v-list-tile-content>
           </v-list-tile>
-            <v-list-tile
-              v-for="master in dataMaster"
-              :key="master.title"
-              @click="pushRoute(master.path)"
-            >
-              <v-list-tile-action>
-                <v-icon>{{ master.icon }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>{{ master.title }}</v-list-tile-title>
-              </v-list-tile-content>
+        </v-list>
+        <v-list v-if="getLevel == 2" class="pt-0" dense>
+          <v-divider></v-divider>
+          <v-list-group
+            prepend-icon="account_circle"
+            value="false"
+          >
+            <v-list-tile slot="activator">
+              <v-list-tile-title>Data Master</v-list-tile-title>
             </v-list-tile>
-        </v-list-group>
-        <v-list-tile
-          v-for="item in (getLevel == 2 ? itemsAdmin : items)"
-          :key="item.title"
-          @click="pushRoute(item.routename)"
-        >
-          <v-list-tile-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-      </v-list>
-    </v-navigation-drawer>
+              <v-list-tile
+                v-for="master in dataMaster"
+                :key="master.title"
+                @click="pushRoute(master.path)"
+              >
+                <v-list-tile-action>
+                  <v-icon>{{ master.icon }}</v-icon>
+                </v-list-tile-action>
+                <v-list-tile-content>
+                  <v-list-tile-title>{{ master.title }}</v-list-tile-title>
+                </v-list-tile-content>
+              </v-list-tile>
+          </v-list-group>
+          <v-list-tile
+            v-for="item in (getLevel == 2 ? itemsAdmin : items)"
+            :key="item.title"
+            @click="pushRoute(item.routename)"
+          >
+            <v-list-tile-action>
+              <v-icon>{{ item.icon }}</v-icon>
+            </v-list-tile-action>
+            <v-list-tile-content>
+              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
+            </v-list-tile-content>
+          </v-list-tile>
+        </v-list>
+      </v-navigation-drawer>
+    </transition>
   </v-app>
 </template>
+
+<style>
+.bounce-enter-active {
+  animation: bounce-in .5s;
+}
+.bounce-leave-active {
+  animation: bounce-in .5s reverse;
+}
+@keyframes bounce-in {
+  0% {
+    transform: scale(0);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+</style>
+
 
 <script>
 export default {
@@ -119,6 +146,7 @@ export default {
         { title: 'Kelas', icon: 'room', path: '/admin/kelas'},
         { title: 'Berita', icon: 'description', path: '/admin/berita'},
         { title: 'User', icon: 'person', path: '/admin/user'},
+        { title: 'Jam Pelajaran', icon: 'access_alarm', path: '/admin/jampelajaran'},
         { title: 'Semester', icon: 'list', path: '/admin/semester'},
         { title: 'Hari', icon: 'event', path: '/admin/hari'}
       ],
@@ -149,6 +177,9 @@ export default {
       if(id === 2){
         this.$store.dispatch('authentication/logOut')
       }
+    },
+    showProfile(){
+      this.$router.push('/admin/profile')
     }
   },
   computed: {

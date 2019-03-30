@@ -129,6 +129,22 @@ const router = new Router({
         title: 'Admin: Berita'
       },
       component: () => import(/* webpackChunkName: "berita" */'./views/admin/Berita.vue')
+    },
+    {
+      path: '/admin/profile',
+      name: 'adminprofile',
+      meta:{
+        title: 'Admin: Profile',
+      },
+      component: () => import(/*webpackChunkName: "admin profile" */ './views/Profile.vue')
+    },
+    {
+      path: '/admin/jampelajaran',
+      name: 'adminjampelajaran',
+      meta:{
+        title: 'Admin: Jam Pelajaran',
+      },
+      component: () => import(/*webpackChunkName: "admin profile" */ './views/admin/JamPelajaran.vue')
     }
   ]
 })

@@ -7,6 +7,8 @@ import {loadpage} from './loading.store'
 import {teachers} from './teacher.store'
 import {students} from './student.store'
 import {studies} from './studies.store'
+import {schedules} from './schedule.store'
+import {times} from './time.store'
 
 Vue.use(Vuex)
 
@@ -17,6 +19,8 @@ export default new Vuex.Store({
     loadpage,
     teachers,
     students,
-    studies
+    studies,
+    schedules,
+    times
   }
 })
