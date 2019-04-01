@@ -8,7 +8,7 @@ async function list({index, rows, search, sortby, sort}, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/student`, 
+                `${config.endpoint}/class`, 
                 {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
                 ),
             config.getconfig())
@@ -24,13 +24,18 @@ async function list({index, rows, search, sortby, sort}, callback){
     callback(result)
 }
 
-async function classList(callback){
+async function lightsrc(search, callback){
     let result = {
         json: null,
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/class/all`, config.getconfig())
+        let response = await fetch(
+            config.getUrlParams(
+                `${config.endpoint}/class/all`, 
+                {search: search}
+                ),
+            config.getconfig())
         let json = await response.json()
         if(response.status == 200){
             result.json = json.response
@@ -49,7 +54,7 @@ async function insert(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/student`, config.postdatafile(data))
+        let response = await fetch(`${config.endpoint}/class`, config.postdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -68,7 +73,7 @@ async function del(id, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/student`, config.deletedataconfig({id: id}))
+        let response = await fetch(`${config.endpoint}/class`, config.deletedataconfig({id: id}))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -87,7 +92,7 @@ async function update(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/student`, config.putdatafile(data))
+        let response = await fetch(`${config.endpoint}/class`, config.putdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -116,11 +121,11 @@ function upload(data, callback){
     });
 }
 
-export const student = {
+export const classes = {
     list,
     insert,
     del,
     update,
     upload,
-    classList
+    lightsrc
 }
