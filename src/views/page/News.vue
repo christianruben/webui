@@ -2,9 +2,6 @@
   <v-container>
     <v-list three-line>
       <template v-for="(item, index) in items">
-        <v-subheader>
-          {{ title }}
-        </v-subheader>
         <ListNews
           :key="item.id"
           :item="item"/>
