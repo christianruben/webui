@@ -21,7 +21,7 @@ const router = new Router({
       // route level code-splitting
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/News.vue')
+      component: () => import(/* webpackChunkName: "about" */ '@/views/News.vue')
     },
     {
       path: '/login',
@@ -29,12 +29,12 @@ const router = new Router({
       meta: {
         title: 'Login'
       },
-      component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
     },
     {
       path: '/teacher',
       name: 'teacher',
-      component: () => import(/* webpackChunkName: "teacher" */ './views/admin/Guru.vue')
+      component: () => import(/* webpackChunkName: "teacher" */ '@/views/admin/Guru.vue')
     },
     {
       path: '/news/p/:id',
@@ -42,12 +42,12 @@ const router = new Router({
       meta: {
         title: 'Home'
       },
-      component: () => import(/* webpackChunkName: "newspost" */ './views/Post.vue')
+      component: () => import(/* webpackChunkName: "newspost" */ '@/views/Post.vue')
     },
     {
       path: '/schedule',
       name: 'schedule',
-      component: () => import(/* webpackChunkName: "schedule" */ './views/Jadwal.vue')
+      component: () => import(/* webpackChunkName: "schedule" */ '@/views/Jadwal.vue')
     },
     {
       path: '/admin',
@@ -55,7 +55,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Home'
       },
-      component: () => import(/* webpackChunkName: "admin" */ './views/admin/Home.vue')
+      component: () => import(/* webpackChunkName: "admin" */ '@/views/admin/Home.vue')
     }
     ,
     {
@@ -64,7 +64,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Login'
       },
-      component: () => import(/* webpackChunkName: "login" */ './views/Login.vue')
+      component: () => import(/* webpackChunkName: "login" */ '@/views/Login.vue')
     },
     {
       path: '/admin/guru',
@@ -72,7 +72,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Guru'
       },
-      component: () => import(/* webpackChunkName: "guru" */'./views/admin/Guru.vue')
+      component: () => import(/* webpackChunkName: "guru" */'@/views/admin/Guru.vue')
     },
     {
       path: '/admin/siswa',
@@ -80,7 +80,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Siswa'
       },
-      component: () => import(/* webpackChunkName: "siswa" */'./views/admin/Siswa.vue')
+      component: () => import(/* webpackChunkName: "siswa" */'@/views/admin/Siswa.vue')
     },
     {
       path: '/admin/user',
@@ -88,7 +88,7 @@ const router = new Router({
       meta: {
         title: 'Admin: User'
       },
-      component: () => import(/* webpackChunkName: "adminlist" */'./views/admin/Admin.vue')
+      component: () => import(/* webpackChunkName: "adminlist" */'@/views/admin/Admin.vue')
     },
     {
       path: '/admin/akun',
@@ -96,7 +96,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Akun'
       },
-      component: () => import(/* webpackChunkName: "akun" */'./views/admin/Akun.vue')
+      component: () => import(/* webpackChunkName: "akun" */'@/views/admin/Akun.vue')
     },
     {
       path: '/admin/jadwal',
@@ -104,7 +104,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Jadwal'
       },
-      component: () => import(/* webpackChunkName: "jadwal" */'./views/admin/Jadwal.vue')
+      component: () => import(/* webpackChunkName: "jadwal" */'@/views/admin/Jadwal.vue')
     },
     {
       path: '/admin/pelajaran',
@@ -112,7 +112,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Pelajaran'
       },
-      component: () => import(/* webpackChunkName: "pelajaran" */'./views/admin/Pelajaran.vue')
+      component: () => import(/* webpackChunkName: "pelajaran" */'@/views/admin/Pelajaran.vue')
     },
     {
       path: '/admin/kelas',
@@ -120,7 +120,15 @@ const router = new Router({
       meta: {
         title: 'Admin: Kelas'
       },
-      component: () => import(/* webpackChunkName: "kelas" */'./views/admin/Admin.vue')
+      component: () => import(/* webpackChunkName: "kelas" */'@/views/admin/Kelas.vue')
+    },
+    {
+      path: '/admin/jurusan',
+      name: 'adminjurusan',
+      meta: {
+        title: 'Admin: Jurusan'
+      },
+      component: () => import(/* webpackChunkName: "jurusan" */'@/views/admin/Jurusan.vue')
     },
     {
       path: '/admin/berita',
@@ -128,7 +136,7 @@ const router = new Router({
       meta: {
         title: 'Admin: Berita'
       },
-      component: () => import(/* webpackChunkName: "berita" */'./views/admin/Berita.vue')
+      component: () => import(/* webpackChunkName: "berita" */'@/views/admin/Berita.vue')
     },
     {
       path: '/admin/profile',
@@ -136,7 +144,7 @@ const router = new Router({
       meta:{
         title: 'Admin: Profile',
       },
-      component: () => import(/*webpackChunkName: "admin profile" */ './views/Profile.vue')
+      component: () => import(/*webpackChunkName: "admin profile" */ '@/views/Profile.vue')
     },
     {
       path: '/admin/jampelajaran',
@@ -144,12 +152,13 @@ const router = new Router({
       meta:{
         title: 'Admin: Jam Pelajaran',
       },
-      component: () => import(/*webpackChunkName: "admin profile" */ './views/admin/JamPelajaran.vue')
+      component: () => import(/*webpackChunkName: "admin profile" */ '@/views/admin/JamPelajaran.vue')
     }
   ]
 })
 
 router.beforeEach((to, from, next) => {
+  if(to === from) return
   if(cookies.isKey('apitoken') && cookies.get('apitoken')){
     if(!session.exists()){
       session.set('apitoken', cookies.get('apitoken'))

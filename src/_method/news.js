@@ -1,94 +1,106 @@
 import {config} from './config';
 
-function getNewsList({index, search}, callback){
-	let result = {
-		json: null,
-		err: null
-	}
-	fetch(config.getUrlParams(`${config.endpoint}/news`, {'index':index, 'search': search}), config.getconfig).then(res=>{
-		return {status: res.status, json: res.json()};
-	}).then(resfetch=>{
-		if(resfetch.status === 200) result.json = resfetch.json;
-		else result.err = resfetch.json.message;
-		callback(result);
-	}).catch(err=>{
-		result.err = err;
-		callback(result);
-	});
+async function list({index, rows, search, sortby, sort}, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    try{
+        let response = await fetch(
+            config.getUrlParams(
+                `${config.endpoint}/news`, 
+                {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
+                ),
+            config.getconfig())
+        let json = await response.json()
+        if(response.status == 200){
+            result.json = json.response
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
 }
 
-function loadNews(id, callback){
-	let result = {
-		json: null,
-		err: null
-	}
-	fetch(`${config.endpoint}/news/${id}`, config.getconfig).then(res=>{
-		return {status: res.status, json: res.json()};
-	}).then(resfetch=>{
-		if(resfetch.status === 200) result.json = resfetch.json;
-		else result.err = resfetch.json.message;
-		callback(result);
-	}).catch(err=>{
-		result.err = err;
-		callback(result);
-	});
+async function insert(data, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    try{
+        let response = await fetch(`${config.endpoint}/news`, config.postdatafile(data))
+        let json = await response.json()
+        if(response.status == 200){
+            result.json = json.data
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
 }
 
-function inputNews({title, content, id}, callback){
-	let result = {
-		json: null,
-		err: null
-	}
-	fetch(`${config.endpoint}/news`, config.postdataconfig({title: title, content: content, id: id})).then(res=>{
-		return {status: res.status, json: res.json()};
-	}).then(resfetch=>{
-		if(resfetch.status === 200) result.json = resfetch.json;
-		else result.err = resfetch.json.message;
-		callback(result);
-	}).catch(err=>{
-		result.err = err;
-		callback(result);
-	});
+async function del(id, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    try{
+        let response = await fetch(`${config.endpoint}/news`, config.deletedataconfig({id: id}))
+        let json = await response.json()
+        if(response.status == 200){
+            result.json = json.data
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
 }
 
-function deleteNews(id, callback){
-	let result = {
-		json: null,
-		err: null
-	}
-	fetch(config.getUrlParams(`${config.endpoint}/news`, {'id': id}), config.deleteconfig).then(res=>{
-		return {status: res.status, json: res.json()};
-	}).then(resfetch=>{
-		if(resfetch.status === 200) result.json = resfetch.json;
-		else result.err = resfetch.json.message;
-		callback(result);
-	}).catch(err=>{
-		result.err = err;
-		callback(result);
-	});
+async function update(data, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    try{
+        let response = await fetch(`${config.endpoint}/news`, config.putdatafile(data))
+        let json = await response.json()
+        if(response.status == 200){
+            result.json = json.data
+        }else{
+            result.err = json.message
+        }
+    }catch(err){
+        result.err = err
+    }
+    callback(result)
 }
 
-function updateNews({idNews, title, content}, callback){
-	let result = {
-		json: null,
-		err: null
-	}
-	fetch(`${config.endpoint}/news`, config.putdataconfig({id: idNews, title: title, content: content})).then(res=>{
-		return {status: res.status, json: res.json()};
-	}).then(resfetch=>{
-		if(resfetch.status === 200) result.json = resfetch.json;
-		else result.err = resfetch.json.message;
-		callback(result);
-	}).catch(err=>{
-		result.err = err;
-		callback(result);
-	});
+function upload(data, callback){
+    let result = {
+        json: null,
+        err: null
+    }
+    fetch(`${config.endpoint}`, config.putconfig).then(res=>{
+        return res.json();
+    }).then(json=>{
+        result.json = json;
+        callback(result);
+    }).catch(err=>{
+        result.err = err;
+        callback(result);
+    });
 }
 
 export const news = {
-	getNewsList,
-	loadNews,
-	inputNews,
-	deleteNews,
-	updateNews
+    list,
+    insert,
+    del,
+    update,
+    upload,
 }

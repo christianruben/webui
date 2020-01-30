@@ -49,10 +49,8 @@
         :close-on-content-click="false"
         :nudge-right="40"
         :return-value.sync="forminput.borndate"
-        lazy
         transition="scale-transition"
         offset-y
-        full-width
         min-width="290px"
       >
       <template v-slot:activator="{ on }">

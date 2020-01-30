@@ -1,129 +1,173 @@
 <template>
   <v-app>
     <transition name="component-fade" mode="out-in">
-      <v-toolbar v-if="auth"
+      <v-app-bar 
+        v-if="auth"
         fixed
         app>
-        <v-toolbar-side-icon v-if="!drawer" @click="drawer = !drawer"></v-toolbar-side-icon>
+        <v-app-bar-nav-icon v-if="!drawer" @click="drawer = !drawer"></v-app-bar-nav-icon>
         <v-toolbar-title>{{ $route.meta.title }}</v-toolbar-title>
         <v-spacer></v-spacer>
         <v-menu bottom left>
-          <v-btn
-            slot="activator"
-            light
-            icon
-          >
-            <v-icon>more_vert</v-icon>
-          </v-btn>
-
+          <template 
+            v-slot:activator="{ on }">
+            <v-btn
+              v-on="on"
+              light
+              icon>
+              <v-icon>more_vert</v-icon>
+            </v-btn>
+          </template>
           <v-list>
-            <v-list-tile
+            <v-list-item
               v-for="(item, i) in menuItems"
               :key="i"
-              ripple
-              @click="optionClick(item.id)"
-            >
-              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-            </v-list-tile>
+              @click="optionClick(item.id)">
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item>
           </v-list>
         </v-menu>
-      </v-toolbar>
+      </v-app-bar>
     </transition>
+    <v-dialog
+      persistent
+      v-model="settingpop"
+      max-width="250px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Settings</span>
+        </v-card-title>
+        <v-card-text>
+          Theme
+          <v-switch
+            v-model="theme"
+            :label="`${theme?'Dark':'Light'}`"
+            v-on:change="changeTheme()"
+          ></v-switch>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn 
+            color="blue darken-1" 
+            text 
+            @click="closeSetting">
+            Close
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog 
+      persistent 
+      v-model="confirmLogout" 
+      max-width="300px">
+      <v-card>
+        <v-card-title>
+          <span class="headline">Confirm</span>
+        </v-card-title>
+        <v-card-text>
+          Are you sure want to logout?
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn 
+            color="blue darken-1" 
+            text 
+            @click="cancelLogout">
+            Cancel
+          </v-btn>
+          <v-btn 
+            color="red darken-1" 
+            text 
+            @click="runLogout">
+            Logout
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
     <v-content>
-      <transition name="component-fade" mode="out-in">
+      <transition 
+        name="component-fade" 
+        mode="out-in">
         <router-view></router-view>
       </transition>
-      <div v-if="loadpage" class="text-xs-center">
-        <v-progress-circular
-          :size="50"
-          color="primary"
-          indeterminate
-        ></v-progress-circular>
+      <div 
+        v-if="loadpage" 
+        class="text-xs-center">
+        <v-progress-circular :size="50" color="primary" indeterminate></v-progress-circular>
       </div>
     </v-content>
     <transition name="component-fade" mode="out-in">
       <v-navigation-drawer
         v-if="auth"
         v-model="drawer"
-        app
-      >
+        app>
         <v-list class="pa-1">
-          <v-list-tile avatar @click="showProfile">
-            <v-list-tile-avatar>
+          <v-list-item @click="showProfile">
+            <v-avatar size="36">
               <img src="https://randomuser.me/api/portraits/men/85.jpg">
-            </v-list-tile-avatar>
-            <v-list-tile-content>
-              <v-list-tile-title>John Leider</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-avatar>
+            <v-list-item-content>
+              <v-list-item-title>&nbsp;&nbsp;&nbsp;John Leider</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
-        <v-list v-if="getLevel == 2" class="pt-0" dense>
+        <v-list 
+          v-if="getLevel == 2" 
+          class="pt-0" 
+          dense>
           <v-divider></v-divider>
           <v-list-group
+            sub-group
             prepend-icon="account_circle"
-            value="false"
-          >
-            <v-list-tile slot="activator">
-              <v-list-tile-title>Data Master</v-list-tile-title>
-            </v-list-tile>
-              <v-list-tile
+            value="true">
+            <v-list-item 
+              slot="activator">
+              <v-list-item-title>Data Master</v-list-item-title>
+            </v-list-item>
+              <v-list-item
                 v-for="master in dataMaster"
                 :key="master.title"
-                @click="pushRoute(master.path)"
-              >
-                <v-list-tile-action>
+                @click="pushRoute(master.path)">
+                <v-list-item-action>
                   <v-icon>{{ master.icon }}</v-icon>
-                </v-list-tile-action>
-                <v-list-tile-content>
-                  <v-list-tile-title>{{ master.title }}</v-list-tile-title>
-                </v-list-tile-content>
-              </v-list-tile>
+                </v-list-item-action>
+                <v-list-item-content>
+                  <v-list-item-title>{{ master.title }}</v-list-item-title>
+                </v-list-item-content>
+              </v-list-item>
           </v-list-group>
-          <v-list-tile
+          <v-list-item
             v-for="item in (getLevel == 2 ? itemsAdmin : items)"
             :key="item.title"
-            @click="pushRoute(item.routename)"
-          >
-            <v-list-tile-action>
+            @click="pushRoute(item.routename)">
+            <v-list-item-action>
               <v-icon>{{ item.icon }}</v-icon>
-            </v-list-tile-action>
-            <v-list-tile-content>
-              <v-list-tile-title>{{ item.title }}</v-list-tile-title>
-            </v-list-tile-content>
-          </v-list-tile>
+            </v-list-item-action>
+            <v-list-item-content>
+              <v-list-item-title>{{ item.title }}</v-list-item-title>
+            </v-list-item-content>
+          </v-list-item>
         </v-list>
       </v-navigation-drawer>
     </transition>
   </v-app>
 </template>
 
-<style>
-.bounce-enter-active {
-  animation: bounce-in .5s;
-}
-.bounce-leave-active {
-  animation: bounce-in .5s reverse;
-}
-@keyframes bounce-in {
-  0% {
-    transform: scale(0);
-  }
-  50% {
-    transform: scale(1.5);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-</style>
-
-
 <script>
+import VApp from 'vuetify/lib/components/VApp'
+import VNavigationDrawer from 'vuetify/lib/components/VNavigationDrawer'
 export default {
   name: 'App',
+  components: {
+    VApp,
+    VNavigationDrawer,
+  },
   data () {
     return {
       //
+      settingpop: false,
+      darkmode: true,
+      confirmLogout: false,
       title: "",
       dialog: false,
       isLogged: true,
@@ -143,9 +187,12 @@ export default {
         { title: 'Guru', icon: 'people', path: '/admin/guru'},
         { title: 'Pelajaran', icon: 'book', path: '/admin/pelajaran'},
         { title: 'Jadwal', icon: 'assignment', path: '/admin/jadwal'},
+        { title: 'Jurusan', icon: 'room', path: '/admin/jurusan'},
         { title: 'Kelas', icon: 'room', path: '/admin/kelas'},
         { title: 'Berita', icon: 'description', path: '/admin/berita'},
         { title: 'User', icon: 'person', path: '/admin/user'},
+        { title: 'Akun', icon: 'person', path: '/admin/akun '},
+        { title: 'Nilai Siswa', icon: 'person', path: 'admin/nilai'},
         { title: 'Jam Pelajaran', icon: 'access_alarm', path: '/admin/jampelajaran'},
         { title: 'Semester', icon: 'list', path: '/admin/semester'},
         { title: 'Hari', icon: 'event', path: '/admin/hari'}
@@ -171,12 +218,30 @@ export default {
   },
   methods: {
     pushRoute(name){
-      this.$router.push(name);
+      this.$router.push(name).catch((err)=>{
+        err
+      });
     },
     optionClick(id){
       if(id === 2){
-        this.$store.dispatch('authentication/logOut')
+        this.confirmLogout = true
+      }else{
+        this.settingpop = true
       }
+    },
+    closeSetting(){
+      this.settingpop = false
+    },
+    cancelLogout(){
+      this.confirmLogout = false
+    },
+    runLogout(){
+      this.confirmLogout = false
+      this.$store.dispatch('authentication/logOut')
+    },
+    changeTheme(){
+      this.$store.dispatch('settings/changeTheme', !this.theme)
+      this.$vuetify.theme.dark = this.theme
     },
     showProfile(){
       this.$router.push('/admin/profile')
@@ -185,6 +250,14 @@ export default {
   computed: {
     auth(){
       return this.$store.getters['authentication/isUserLogged']
+    },
+    theme:{
+      get(){
+        return this.$store.getters['settings/themeMode']
+      },
+      set(value){
+        return value
+      }
     },
     getLevel(){
       return this.$store.state.authentication.level
@@ -197,8 +270,7 @@ export default {
     this.$store.dispatch('header/switchOn')
   },
   mounted() {
-    const {dispatch} = this.$store
-    dispatch('students/storeClass')
+    this.$vuetify.theme.dark = this.theme
   },
 }
 </script>

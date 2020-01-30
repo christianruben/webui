@@ -9,6 +9,9 @@ import {students} from './student.store'
 import {studies} from './studies.store'
 import {schedules} from './schedule.store'
 import {times} from './time.store'
+import {settings} from './settings.store'
+import {classdata} from './classdata.store';
+import {newsStore} from './news.store';
 
 Vue.use(Vuex)
 
@@ -21,6 +24,9 @@ export default new Vuex.Store({
     students,
     studies,
     schedules,
-    times
+    times,
+    settings,
+    classdata,
+    newsStore
   }
 })

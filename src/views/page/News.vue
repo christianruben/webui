@@ -27,13 +27,12 @@
 </template>
 
 <script>
-  import ListNews from '../components/ListNews'
   export default {
     components: {
-      ListNews
+      ListNews: () => import('@/components/ListNews')
     },
     data () {
-      title: "News"
+      "News"
     }
   }
 </script>

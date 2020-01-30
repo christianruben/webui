@@ -1,6 +1,6 @@
-import {study} from '../_method'
+import {classes} from '../_method'
 
-export const classes = {
+export const classdata = {
     namespaced: true,
     state: {
         listItems: [],
@@ -16,7 +16,7 @@ export const classes = {
         storeReq({commit}, {index, rows, search, sortby, sort}){
             commit('removeError')
             commit('setLoading', true)
-            study.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
+            classes.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
                 const {err, json} = result;
                 setTimeout(()=>{
                     if(err){
@@ -29,7 +29,7 @@ export const classes = {
             })
         },
         searchLight({commit}, search){
-            study.lightsrc(search, (result)=>{
+            classes.lightsrc(search, (result)=>{
                 const {json} = result
                 setTimeout(()=>{
                     commit('addLightData', json)
@@ -40,7 +40,7 @@ export const classes = {
             commit('removeError')
             commit('setLoading', true)
             commit('setUpload', true)
-            study.insert(data, (result)=>{
+            classes.insert(data, (result)=>{
                 const {err, json} = result;
                 if(err){
                     commit('setError', err)
@@ -58,7 +58,7 @@ export const classes = {
             commit('removeError')
             commit('setLoading', true)
             commit('setUpload', true)
-            study.update(data, (result)=>{
+            classes.update(data, (result)=>{
                 const {err, json} = result;
                 if(err){
                     commit('setError', err)
@@ -82,7 +82,7 @@ export const classes = {
             commit('removeError')
             commit('setLoading', true)
             commit('setUpload', true)
-            study.del(id, result=>{
+            classes.del(id, result=>{
                 const {err, json} = result
                 if(err){
                     commit('setError', err)
@@ -94,24 +94,6 @@ export const classes = {
                 }
             })
             commit('setLoading', false)
-        },
-        storeClass({commit}){
-            window.$cookies.remove('clsmod')
-            if(window.$cookies.isKey('clsmod')){
-                const list = window.$cookies.get('clsmod')
-                commit('setClass', list)
-                return
-            }
-            study.classList(result=>{
-                const {err, json} = result
-                if(err){
-                    commit('setError', err)
-                }else{
-                    if(json){
-                        commit('setClass', json)
-                    }
-                }
-            })
         },
         removeError({commit}){
             commit('setError', null)

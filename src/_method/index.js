@@ -6,3 +6,4 @@ export * from './student';
 export * from './studies';
 export * from './schedule';
 export * from './time';
+export * from './classes';

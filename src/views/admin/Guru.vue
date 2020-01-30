@@ -19,8 +19,8 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="closeDialog">Cancel</v-btn>
-            <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+            <v-btn color="blue darken-1" text @click="closeDialog">Cancel</v-btn>
+            <v-btn color="blue darken-1" text @click="save">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -52,39 +52,30 @@
       ></v-text-field>
     </v-card-title>
     <v-data-table
-      v-model="selected"
-      :headers="theaders"
+      :headers="headers"
       :items="table"
-      :pagination.sync="pagination"
-      :total-items="lentable"
+      :options.sync="options"
+      :server-items-length="lentable"
       :loading="isLoading"
       class="elevation-1"
+      :footer-props="{
+        'items-per-page-options': [5, 10, 15, 20, 30]
+      }"
     >
-      <template v-slot:items="props">
-        <td>{{ props.item.name }}</td>
-        <td>{{ props.item.NIP }}</td>
-        <td>{{ props.item.gender }}</td>
-        <td>{{ props.item.religion }}</td>
-        <td>{{ props.item.born_place }}</td>
-        <td>{{ props.item.dateborn }}</td>
-        <td>{{ props.item.address }}</td>
-        <td>{{ props.item.phone_number }}</td>
-        <td class="justify-center layout px-0">
-          <v-icon
-            small
-            class="mr-2"
-            @click="editItem(props.index)"
-          >
-            edit
-          </v-icon>
-          <v-icon
-            small
-            class="mr-2"
-            @click="deleteItem(props.item)"
-          >
-            delete
-          </v-icon>
-        </td>
+      <template v-slot:item.action="{item}">
+        <v-icon
+          small
+          class="mr-2"
+          @click="editItem(item)"
+        >
+          edit
+        </v-icon>
+        <v-icon
+          small
+          @click="deleteItem(item)"
+        >
+          delete
+        </v-icon>
       </template>
     </v-data-table>
     <v-snackbar
@@ -97,7 +88,7 @@
       {{ errorMsg }}
       <v-btn
         dark
-        flat
+        text
         @click="removeError()"
       >
         Close
@@ -106,24 +97,11 @@
   </v-container>
 </template>
 
-<style>
-  /* This is for documentation purposes and will not be needed in your application */
-  #lateral .v-speed-dial,
-  #lateral .v-btn--floating {
-    position: absolute;
-  }
-  #lateral .v-btn--floating {
-    margin: 32px 32px 16px 16px;
-  }
-</style>
-
 <script>
-  import Form from '../../components/Form'
-  import Dialog from '../../components/Dialog'
   export default {
     components: {
-      Form,
-      Dialog
+      Form: () => import('@/components/Form'),
+      Dialog: () => import('@/components/Dialog'),
     },
     data () {
       return {
@@ -151,20 +129,21 @@
         loading: false,
         formTitle: 'Input Guru',
         hidden: false,
-        pagination: {},
+        options: {},
         dialog: false,
         editedIndex: -1,
         idselected: 0,
-        theaders: [
-          {text: 'Nama', value: 'name'},
-          {text: 'NIP', value: 'NIP'},
-          {text: 'Kelamin', value: 'gender'},
-          {text: 'Agama', value: 'religion'},
-          {text: 'Tempat Lahir', value: 'born_place'},
-          {text: 'Tanggal Lahir', value: 'born_date'},
-          {text: 'Alamat', value: 'address'},
-          {text: 'No Telp', value: 'phone_number'},
-          {text: 'Actions', sortable: false }
+        sortingDesc: "ASC",
+        headers: [
+          {text: 'Nama', 'descending': true, value: 'name'},
+          {text: 'NIP', 'descending': true, value: 'NIP'},
+          {text: 'Kelamin', 'descending': true, value: 'gender'},
+          {text: 'Agama', 'descending': true, value: 'religion'},
+          {text: 'Tempat Lahir', 'descending': true, value: 'born_place'},
+          {text: 'Tanggal Lahir', 'descending': true, value: 'dateborn'},
+          {text: 'Alamat', 'descending': true, value: 'address'},
+          {text: 'No Telp', 'descending': true, value: 'phone_number'},
+          {text: 'Actions', 'descending': true, value: 'action', sortable: false }
         ],
         currentY: 0,
         lastY:0
@@ -184,23 +163,23 @@
         const {dispatch} = this.$store;
         dispatch('removeError')
       },
-      editItem (index) {
-        const {relationship, gender, teacher_id} = this.table[index]
+      editItem (item) {
+        const {relationship, gender, teacher_id} = item
         this.editedIndex = -1
         this.forminput = {
           imageFile: null,
-          name: this.table[index].name,
-          nip: this.table[index].NIP,
+          name: item.name,
+          nip: item.NIP,
           gender: `${gender.charAt(0).toUpperCase()}${gender.slice(1)}`,
-          religion: this.table[index].religion,
-          bornplace: this.table[index].born_place,
-          borndate: this.table[index].dateborn,
-          address: this.table[index].address,
-          phonenumber: this.table[index].phone_number,
+          religion: item.religion,
+          bornplace: item.born_place,
+          borndate: item.dateborn,
+          address: item.address,
+          phonenumber: item.phone_number,
           relationship: `${relationship.charAt(0).toUpperCase()}${relationship.slice(1)}`,
         }
         this.idselected = teacher_id
-        this.imageUrl = `http://localhost:3000/images/uploads/${this.table[index].picture}`
+        this.imageUrl = `http://localhost:3000/images/uploads/${item.picture}`
         this.formTitle = 'Edit Guru'
         const {dispatch} = this.$store;
         dispatch('openDialog')
@@ -224,9 +203,10 @@
         const {dispatch} = this.$store;
         dispatch('openDialog')
       },
-      deleteItem (id) {
+      deleteItem (item) {
+        const index = this.table.indexOf(item)
         this.alert = true
-        this.idselected = id
+        this.idselected = index
       },
       OkButton(){
         const {dispatch} = this.$store;
@@ -269,13 +249,15 @@
         // this.close()
       },
       getDataFromApi(){
-        if(this.isLoading) return;
         const {dispatch} = this.$store;
-        let {sortBy, descending, page, rowsPerPage} = this.pagination
-        if(sortBy){
+        let {sortBy, sortDesc, page, itemsPerPage} = this.options
+        if(sortBy.length > 0){
           this.sortbylast = sortBy
         }
-        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
+        if(sortDesc.length === 1){
+          this.sortingDesc = !sortDesc[0] ? "ASC" : "DESC"
+        }
+        dispatch('storeReq', {index: page, rows: itemsPerPage, search: this.search, sortby: this.sortbylast, sort: this.sortingDesc})
       }
     },
     computed: {
@@ -296,7 +278,7 @@
       },
       params(){
           return {
-              ...this.pagination,
+              ...this.options,
               query: this.search
           }
       },
@@ -313,7 +295,7 @@
         },
         deep: true
       },
-      pagination: {
+      options: {
         handler () {
           this.getDataFromApi();
         },

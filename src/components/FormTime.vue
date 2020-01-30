@@ -14,10 +14,8 @@
         :close-on-content-click="false"
         :nudge-right="40"
         :return-value.sync="forminput.time_start"
-        lazy
         transition="scale-transition"
         offset-y
-        full-width
         max-width="290px"
         min-width="290px"
     >
@@ -35,7 +33,6 @@
         <v-time-picker
             v-if="menustart"
             v-model="forminput.time_start"
-            full-width
             @click:minute="$refs.menu.save(forminput.time_start)"
         ></v-time-picker>
     </v-menu>
@@ -45,10 +42,8 @@
         :close-on-content-click="false"
         :nudge-right="40"
         :return-value.sync="forminput.time_end"
-        lazy
         transition="scale-transition"
         offset-y
-        full-width
         max-width="290px"
         min-width="290px"
     >
@@ -66,7 +61,6 @@
         <v-time-picker
             v-if="menuend"
             v-model="forminput.time_end"
-            full-width
             @click:minute="$refs.menu.save(forminput.time_end)"
         ></v-time-picker>
     </v-menu>

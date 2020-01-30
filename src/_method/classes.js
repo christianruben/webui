@@ -32,7 +32,7 @@ async function lightsrc(search, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/class/all`, 
+                `${config.endpoint}/class/light`, 
                 {search: search}
                 ),
             config.getconfig())

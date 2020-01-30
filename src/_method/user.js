@@ -116,7 +116,7 @@ function upload(data, callback){
     });
 }
 
-export const user/admin = {
+export const user = {
     list,
     insert,
     del,

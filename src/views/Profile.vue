@@ -5,7 +5,7 @@
                 xs12
                 md4
             >
-                <material-card class="v-card-profile">
+                <div class="v-card-profile">
                     <v-avatar
                         slot="offset"
                         class="mx-auto d-block"
@@ -17,7 +17,7 @@
                     </v-avatar>
                     <br/>
                     
-                </material-card>
+                </div>
             </v-flex>
         </v-layout>
     </v-container>

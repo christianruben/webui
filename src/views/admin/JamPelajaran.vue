@@ -17,8 +17,8 @@
           </v-card-text>
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="red darken-1" flat @click="closeDialog">Cancel</v-btn>
-            <v-btn color="green darken-1" flat @click="save">Save</v-btn>
+            <v-btn color="red darken-1" text @click="closeDialog">Cancel</v-btn>
+            <v-btn color="green darken-1" text @click="save">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -39,7 +39,7 @@
         </v-btn>
     </v-fab-transition>
     <v-card-title>
-      Table Guru
+      Table Jam Pelajaran
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -53,31 +53,26 @@
       v-model="selected"
       :headers="theaders"
       :items="table"
-      :pagination.sync="pagination"
-      :total-items="lentable"
+      :options.sync="options"
+      :server-items-length="lentable"
       :loading="isLoading"
       class="elevation-1"
     >
-      <template v-slot:items="props">
-        <td>{{ props.item.time_name }}</td>
-        <td>{{ props.item.time_start }}</td>
-        <td>{{ props.item.time_end }}</td>
-        <td class="justify-center layout px-0">
-          <v-icon
-            small
-            class="mr-2"
-            @click="editItem(props.index)"
-          >
-            edit
-          </v-icon>
-          <v-icon
-            small
-            class="mr-2"
-            @click="deleteItem(props.item)"
-          >
-            delete
-          </v-icon>
-        </td>
+      <template v-slot:item.action="{item}">
+        <v-icon
+          small
+          class="mr-2"
+          @click="editItem(item)"
+        >
+          edit
+        </v-icon>
+        <v-icon
+          small
+          class="mr-2"
+          @click="deleteItem(item)"
+        >
+          delete
+        </v-icon>
       </template>
     </v-data-table>
     <v-snackbar
@@ -90,7 +85,7 @@
       {{ errorMsg }}
       <v-btn
         dark
-        flat
+        text
         @click="removeError()"
       >
         Close
@@ -99,24 +94,11 @@
   </v-container>
 </template>
 
-<style>
-  /* This is for documentation purposes and will not be needed in your application */
-  #lateral .v-speed-dial,
-  #lateral .v-btn--floating {
-    position: absolute;
-  }
-  #lateral .v-btn--floating {
-    margin: 32px 32px 16px 16px;
-  }
-</style>
-
 <script>
-  import FormTime from '../../components/FormTime'
-  import Dialog from '../../components/Dialog'
   export default {
     components: {
-      FormTime,
-      Dialog
+      FormTime: () => import('@/components/FormTime'),
+      Dialog: () => import('@/components/Dialog'),
     },
     data () {
       return {
@@ -134,11 +116,12 @@
         total: 0,
         selected: [],
         sortbylast: null,
+        sortingDesc: "ASC",
         search: "",
         loading: false,
         formTitle: 'Input Guru',
         hidden: false,
-        pagination: {},
+        options: {},
         dialog: false,
         editedIndex: -1,
         idselected: 0,
@@ -146,7 +129,7 @@
           {text: 'Jam Pelajaran', value: 'time_name'},
           {text: 'Jam Mulai', value: 'time_start'},
           {text: 'Jam Berakhir', value: 'time_end'},
-          {text: 'Actions', align: 'center', sortable: false }
+          {text: 'Actions', value: 'action', sortable: false }
         ],
         currentY: 0,
         lastY:0
@@ -166,15 +149,15 @@
         const {dispatch} = this.$store;
         dispatch('times/removeError')
       },
-      editItem (index) {
-        const {time_name, time_start, time_end} = this.table[index]
+      editItem (item) {
+        const {time_name, time_start, time_end} = item
         this.editedIndex = -1
         this.forminput = {
           timename: time_name,
           timestart: time_start,
           timeend: time_end,
         }
-        this.idselected = this.table[index]
+        this.idselected = item
         this.formTitle = 'Edit Jam Pelajaran'
         const {dispatch} = this.$store;
         dispatch('times/openDialog')
@@ -191,9 +174,10 @@
         const {dispatch} = this.$store;
         dispatch('times/openDialog')
       },
-      deleteItem (id) {
+      deleteItem (item) {
+        const index = this.table.indexOf(item)
         this.alert = true
-        this.idselected = id
+        this.idselected = index
       },
       OkButton(){
         const {dispatch} = this.$store;
@@ -231,13 +215,15 @@
         // this.close()
       },
       getDataFromApi(){
-        if(this.isLoading) return;
         const {dispatch} = this.$store;
-        let {sortBy, descending, page, rowsPerPage} = this.pagination
-        if(sortBy){
+        let {sortBy, sortDesc, page, itemsPerPage} = this.options
+        if(sortBy.length > 0){
           this.sortbylast = sortBy
         }
-        dispatch('times/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
+        if(sortDesc.length === 1){
+          this.sortingDesc = !sortDesc[0] ? "ASC" : "DESC"
+        }
+        dispatch('times/storeReq', {index: page, rows: itemsPerPage, search: this.search, sortby: this.sortbylast, sort: this.sortingDesc})
       }
     },
     computed: {
@@ -258,7 +244,7 @@
       },
       params(){
           return {
-              ...this.pagination,
+              ...this.options,
               query: this.search
           }
       },
@@ -275,7 +261,7 @@
         },
         deep: true
       },
-      pagination: {
+      options: {
         handler () {
           this.getDataFromApi();
         },

@@ -12,7 +12,6 @@
                     :value="errMessage"
                     color="error"
                     icon="warning"
-                    outline
                     transition="fade-transition"
                 >
                     {{errMessage}}

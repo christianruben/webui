@@ -16,7 +16,7 @@
 
           <v-btn
             color="red darken-1"
-            flat="flat"
+            text
             @click="$emit('no')"
           >
             Tidak
@@ -24,7 +24,7 @@
 
           <v-btn
             color="green darken-1"
-            flat="flat"
+            text
             @click="$emit('ok')"
           >
             Iya

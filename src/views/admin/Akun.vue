@@ -33,8 +33,8 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="blue darken-1" flat @click="close">Cancel</v-btn>
-            <v-btn color="blue darken-1" flat @click="save">Save</v-btn>
+            <v-btn color="blue darken-1" text @click="close">Cancel</v-btn>
+            <v-btn color="blue darken-1" text @click="save">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -68,38 +68,23 @@
       v-model="selected"
       :headers="theaders"
       :items="table"
-      :pagination.sync="pagination"
-      :total-items="lentable"
+      :options.sync="options"
+      :server-items-length="lentable"
       :loading="isLoading"
       class="elevation-1"
-      item-key="name"
-      select-all
     >
-      <template v-slot:items="props">
-      <td>
-        <v-checkbox
-          v-model="props.selected"
-          primary
-          hide-details
-        ></v-checkbox>
-      </td>
-      <td>{{ props.item.name }}</td>
-      <td>{{ props.item.NIP }}</td>
-      <td>{{ props.item.gender }}</td>
-      <td>{{ props.item.religion }}</td>
-      <td>{{ props.item.born_place }}</td>
-      <td>{{ props.item.dateborn }}</td>
+      <template v-slot:item.action="{item}">
       <td class="justify-center layout px-0">
         <v-icon
           small
           class="mr-2"
-          @click="editItem(props.item)"
+          @click="editItem(item)"
         >
           edit
         </v-icon>
         <v-icon
           small
-          @click="deleteItem(props.item)"
+          @click="deleteItem(item)"
         >
           delete
         </v-icon>
@@ -108,17 +93,6 @@
     </v-data-table>
   </v-container>
 </template>
-
-<style>
-  /* This is for documentation purposes and will not be needed in your application */
-  #lateral .v-speed-dial,
-  #lateral .v-btn--floating {
-    position: absolute;
-  }
-  #lateral .v-btn--floating {
-    margin: 32px 32px 16px 16px;
-  }
-</style>
 
 <script>
   export default {
@@ -131,7 +105,7 @@
         loading: false,
         formTitle: 'Guru',
         hidden: false,
-        pagination: {},
+        options: {},
         dialog: false,
         editedIndex: -1,
         editedItem: {
@@ -181,13 +155,15 @@
         this.close()
       },
       getDataFromApi(){
-        if(this.isLoading) return;
         const {dispatch} = this.$store;
-        let {sortBy, descending, page, rowsPerPage} = this.pagination
-        if(sortBy){
+        let {sortBy, sortDesc, page, itemsPerPage} = this.options
+        if(sortBy.length > 0){
           this.sortbylast = sortBy
         }
-        dispatch('storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"}, {root: true})
+        if(sortDesc.length === 1){
+          this.sortingDesc = !sortDesc[0] ? "ASC" : "DESC"
+        }
+        dispatch('schedules/storeReq', {index: page, rows: itemsPerPage, search: this.search, sortby: this.sortbylast, sort: this.sortingDesc})
       }
     },
     computed: {
@@ -202,13 +178,13 @@
       },
       params(){
           return {
-              ...this.pagination,
+              ...this.options,
               query: this.search
           }
       }
     },
     watch: {
-      pagination: {
+      options: {
         handler () {
           this.getDataFromApi();
         },

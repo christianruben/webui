@@ -1,27 +1,67 @@
 import {news} from '../_method';
 
-export const news = {
-    namespace: true,
+export const newsStore = {
+    namespaced: true,
     state: {
-        result: {},
-        loading: false
+        listItems: [],
+        classItems: [],
+        error: null,
+        totalItems: 0,
+        loading: false,
+        upload: false,
+        dialog: false
     },
     actions: {
-        insertItems({commit}, {index, search}){
-            commit('updateLoading', true)
-            news.getNewsList({index: index, search: search}, (json, err)=>{
-                if(!err){
-                    let {status, data, message} = json
-                    if(status === 200){
-                        commit('addAll', data)
+        storeReq({commit}, {index, rows, search, sortby, sort}){
+            commit('removeError')
+            commit('setLoading', true)
+            news.list({index: index, rows: rows, search: search, sortby: sortby, sort: sort}, (result)=>{
+                const {err, json} = result;
+                setTimeout(()=>{
+                    if(err){
+                        commit('setError', err)
                     }else{
-                        commit('setErr', message)
+                        commit('addAll', {items: json.table, len: json.len})
                     }
-                }else{
-                    commit('setErr', err)
-                }
-                commit('updateLoading', false)
+                    commit('setLoading', false)
+                }, 100)
             })
+        },
+        uploadNews({commit}, {data}) {
+            commit('removeError')
+            commit('setLoading', true)
+            commit('setUpload', true)
+            news.insert(data, (result)=>{
+                const {err, json} = result;
+                if(err){
+                    commit('setError', err)
+                    commit('setUpload', true)
+                }else{
+                    if(json){
+                        commit('setUpload', false)
+                        commit('setDialog', false)
+                    }
+                }
+            })
+            commit('setLoading', false)
+        },
+        updateNews({commit}, {data}){
+            commit('removeError')
+            commit('setLoading', true)
+            commit('setUpload', true)
+            news.update(data, (result)=>{
+                const {err, json} = result;
+                if(err){
+                    commit('setError', err)
+                    commit('setUpload', true)
+                }else{
+                    if(json){
+                        commit('setUpload', false)
+                        commit('setDialog', false)
+                    }
+                }
+            })
+            commit('setLoading', false)
         },
         updateItems({commit}, {id, items}){
             commit('updateItems', {id, items})
@@ -29,55 +69,123 @@ export const news = {
         deleteItems({commit}, {id}){
             commit('deleteItems', {id})
         },
-        getItems({commit}, {items, length}){
-            commit('addAll', {items, length})
+        deleteNews({commit}, {id}){
+            commit('removeError')
+            commit('setLoading', true)
+            commit('setUpload', true)
+            news.del(id, result=>{
+                const {err, json} = result
+                if(err){
+                    commit('setError', err)
+                    commit('setUpload', true)
+                }else{
+                    if(json){
+                        commit('setUpload', false)
+                    }
+                }
+            })
+            commit('setLoading', false)
+        },
+        storeClass({commit}){
+            window.$cookies.remove('clsmod')
+            if(window.$cookies.isKey('clsmod')){
+                const list = window.$cookies.get('clsmod')
+                commit('setClass', list)
+                return
+            }
+            news.classList(result=>{
+                const {err, json} = result
+                if(err){
+                    commit('setError', err)
+                }else{
+                    if(json){
+                        commit('setClass', json)
+                    }
+                }
+            })
+        },
+        removeError({commit}){
+            commit('setError', null)
+        },
+        openDialog({commit}){
+            commit('setDialog', true)
+        },
+        closeDialog({commit}){
+            commit('setDialog', false)
         }
     },
     getters: {
         getAllItems(state){
-            let listitem = state.result.listItems;
-            return listitem === undefined ? null : listitem
+            return state.listItems
         },
-        getLengthItems(state){
-            let len = state.result.listlength;
-            return len === undefined ? null : len
+        getLoading(state){
+            return state.loading
+        },
+        getLenItems(state){
+            return state.totalItems
+        },
+        getStatUpload(state){
+            return state.upload
         },
         getError(state){
-            let err = state.result.error;
-            return err === undefined ? null : err 
+            return state.error
+        },
+        getDialog(state){
+            return state.dialog
+        },
+        getClassList(state){
+            return state.classItems
         }
     },
     mutations: {
-        addAll(state, {items, length}){
-            state.result = {listItems : items}
-            state.result = {listlength : length}
+        setClass(state, items){
+            state.classItems = JSON.parse(items)
+            if(!window.$cookies.isKey('clsmod')){
+                window.$cookies.set('clsmod', items, 60 * 60 * 24 * 30)
+            }
+        },
+        setPagination (state, payload) {
+            state.pagination = payload
+        },
+        setLoading(state, stat){
+            state.loading = stat
+        },
+        setDialog(state, stat){
+            state.dialog = stat
+        },
+        setError(state, err){
+            state.error = err
+        },
+        removeError(state){
+            state.error = null
+        },
+        addAll(state, {items, len}){
+            state.listItems = items
+            state.totalItems = len
+        },
+        setUpload(state, val){
+            state.upload = val
         },
         clear(state){
-            state.result = {listItems : [], listlength : 0}
+            state.listItems = []
+            state.lengthItems = 0
         },
-        addItems(state, {item, length}){
-            state.result.listItems.push(item)
-            state.result.listlength = length
+        addItems(state, {item}){
+            state.listItems.push(item)
         },
         updateItems(state, {id, items}){
-            state.result.listItems.find( (item, index) => {
+            state.listItems.find( (item, index) => {
                 if(item.id === id){
-                    state.result.listItems[index] = items
+                    state.listItems[index] = items
                 }
             })
         },
         deleteItems(state, {id}){
-            state.result.listItems.find((item, index)=>{
+            state.listItems.find((item, index)=>{
                 if(item.id === id){
-                    delete state.result.listItems[index]
+                    delete state.listItems[index]
                 }
             })
-        },
-        setErr(state, err){
-            state.result = {error: err}
-        },
-        updateLoading(state, status){
-            state.loading = status
         }
     }
 }

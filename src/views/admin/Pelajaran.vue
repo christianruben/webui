@@ -19,8 +19,8 @@
 
           <v-card-actions>
             <v-spacer></v-spacer>
-            <v-btn color="red darken-1" flat @click="closeDialog">Cancel</v-btn>
-            <v-btn color="green darken-1" flat @click="save">Save</v-btn>
+            <v-btn color="red darken-1" text @click="closeDialog">Cancel</v-btn>
+            <v-btn color="green darken-1" text @click="save">Save</v-btn>
           </v-card-actions>
         </v-card>
       </v-dialog>
@@ -41,7 +41,7 @@
         </v-btn>
     </v-fab-transition>
     <v-card-title>
-      Table Guru
+      Table Pelajaran
       <v-spacer></v-spacer>
       <v-text-field
         v-model="search"
@@ -55,30 +55,25 @@
       v-model="selected"
       :headers="theaders"
       :items="table"
-      :pagination.sync="pagination"
-      :total-items="lentable"
+      :options.sync="options"
+      :server-items-length="lentable"
       :loading="isLoading"
       class="elevation-1"
     >
-      <template v-slot:items="props">
-        <td>{{ props.item.study_name }}</td>
-        <td>{{ props.item.study_code }}</td>
-        <td class="justify-center layout px-0">
-          <v-icon
-            small
-            class="mr-2"
-            @click="editItem(props.index)"
-          >
-            edit
-          </v-icon>
-          <v-icon
-            small
-            class="mr-2"
-            @click="deleteItem(props.item)"
-          >
-            delete
-          </v-icon>
-        </td>
+      <template v-slot:item.action="{item}">
+        <v-icon
+          small
+          class="mr-2"
+          @click="editItem(item)"
+        >
+          edit
+        </v-icon>
+        <v-icon
+          small
+          @click="deleteItem(item)"
+        >
+          delete
+        </v-icon>
       </template>
     </v-data-table>
     <v-snackbar
@@ -100,24 +95,11 @@
   </v-container>
 </template>
 
-<style>
-  /* This is for documentation purposes and will not be needed in your application */
-  #lateral .v-speed-dial,
-  #lateral .v-btn--floating {
-    position: absolute;
-  }
-  #lateral .v-btn--floating {
-    margin: 32px 32px 16px 16px;
-  }
-</style>
-
 <script>
-  import FormStudy from '../../components/FormStudy'
-  import Dialog from '../../components/Dialog'
   export default {
     components: {
-      FormStudy,
-      Dialog
+      FormStudy: () => import('@/components/FormStudy'),
+      Dialog: () => import('@/components/Dialog'),
     },
     data () {
       return {
@@ -138,14 +120,15 @@
         loading: false,
         formTitle: 'Input Guru',
         hidden: false,
-        pagination: {},
+        options: {},
         dialog: false,
         editedIndex: -1,
         idselected: 0,
+        sortingDesc: "ASC",
         theaders: [
           {text: 'Nama Pelajaran', value: 'study_name'},
           {text: 'Kode Pelajaran', value: 'study_code'},
-          {text: 'Actions', align: 'center', sortable: false }
+          {text: 'Actions', value:'action', sortable: false }
         ],
         currentY: 0,
         lastY:0
@@ -165,15 +148,14 @@
         const {dispatch} = this.$store;
         dispatch('studies/removeError')
       },
-      editItem (index) {
-        const {study_name, study_code} = this.table[index]
-        console.log(study_name, study_code)
+      editItem (item) {
+        const {study_name, study_code} = item
         this.editedIndex = -1
         this.forminput = {
           studyname: study_name,
           studycode: study_code,
         }
-        this.idselected = this.table[index]
+        this.idselected = item
         this.formTitle = 'Edit Pelajaran'
         const {dispatch} = this.$store;
         dispatch('studies/openDialog')
@@ -189,9 +171,10 @@
         const {dispatch} = this.$store;
         dispatch('studies/openDialog')
       },
-      deleteItem (id) {
+      deleteItem (item) {
+        const index = this.table.indexOf(item)
         this.alert = true
-        this.idselected = id
+        this.idselected = index
       },
       OkButton(){
         const {dispatch} = this.$store;
@@ -229,13 +212,15 @@
         // this.close()
       },
       getDataFromApi(){
-        if(this.isLoading) return;
         const {dispatch} = this.$store;
-        let {sortBy, descending, page, rowsPerPage} = this.pagination
-        if(sortBy){
+        let {sortBy, sortDesc, page, itemsPerPage} = this.options
+        if(sortBy.length > 0){
           this.sortbylast = sortBy
         }
-        dispatch('studies/storeReq', {index: page, rows: rowsPerPage, search: this.search, sortby: this.sortbylast, sort: !descending ? "ASC" : "DESC"})
+        if(sortDesc.length === 1){
+          this.sortingDesc = !sortDesc[0] ? "ASC" : "DESC"
+        }
+        dispatch('studies/storeReq', {index: page, rows: itemsPerPage, search: this.search, sortby: this.sortbylast, sort: this.sortingDesc})
       }
     },
     computed: {
@@ -256,7 +241,7 @@
       },
       params(){
           return {
-              ...this.pagination,
+              ...this.options,
               query: this.search
           }
       },
@@ -273,7 +258,7 @@
         },
         deep: true
       },
-      pagination: {
+      options: {
         handler () {
           this.getDataFromApi();
         },
