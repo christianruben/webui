@@ -7,3 +7,7 @@ export * from './studies';
 export * from './schedule';
 export * from './time';
 export * from './classes';
+export * from './department';
+export * from './day';
+export * from './report';
+export * from './semester';

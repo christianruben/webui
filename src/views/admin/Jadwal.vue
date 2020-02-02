@@ -182,7 +182,8 @@
       },
       OkButton(){
         const {dispatch} = this.$store;
-        dispatch('schedules/deleteStudy', {id: this.idselected.study_id})
+        dispatch('schedules/deleteSchedule', {id: this.table[this.idselected].schedule_id})
+        dispatch('schedules/deleteItems', {id: this.idselected})
         this.alert = false
         this.idselected = 0
       },

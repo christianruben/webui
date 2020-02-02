@@ -8,12 +8,6 @@
       required
       :rules="nameRules"
     ></v-text-field>
-    <v-text-field
-      v-model="forminput.departmentname"
-      :counter="20"
-      label="Jurusan"
-      required
-    ></v-text-field>
     <v-autocomplete
     v-model="select_department"
     :loading="loading_department"
@@ -48,6 +42,7 @@
     }),
     methods: {
       search_department(){
+        
       }
     },
     watch: {

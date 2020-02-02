@@ -1,6 +1,6 @@
 <template>
   <v-container>
-    <v-dialog persistent :value="dialogActive" max-width="500px">
+    <v-dialog persistent :value="dialogActive" max-width="800px">
         <!-- <template v-slot:activator="{ on }">
           <v-btn color="primary" dark class="mb-2" v-on="on">New Item</v-btn>
         </template> -->
@@ -161,7 +161,8 @@
       },
       OkButton(){
         const {dispatch} = this.$store;
-        dispatch('newsStore/deleteNews', {id: this.idselected.study_id})
+        dispatch('newsStore/deleteNews', {id: this.table[this.idselected].news_id})
+        dispatch('newsStore/deleteItems', {id: this.idselected})
         this.alert = false
         this.idselected = 0
       },

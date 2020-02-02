@@ -153,6 +153,22 @@ const router = new Router({
         title: 'Admin: Jam Pelajaran',
       },
       component: () => import(/*webpackChunkName: "admin profile" */ '@/views/admin/JamPelajaran.vue')
+    },
+    {
+      path: '/admin/hari',
+      name: 'adminhari',
+      meta: {
+        title: 'Admin: Hari',
+      },
+      component: () => import(/*webpackChunkName: "admin day" */ '@/views/admin/Hari.vue')
+    },
+    {
+      path: '/admin/semester',
+      name: 'adminsemester',
+      meta: {
+        title: 'Admin: Semester',
+      },
+      component: () => import(/*webpackChunkName: "admin semester" */ '@/views/admin/Semester.vue')
     }
   ]
 })

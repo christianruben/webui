@@ -8,7 +8,7 @@ async function list({index, rows, search, sortby, sort}, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/time`, 
+                `${config.endpoint}/semester`, 
                 {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
                 ),
             config.getconfig())
@@ -32,7 +32,7 @@ async function lightsrc(search, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/time/light`, 
+                `${config.endpoint}/semester/light`, 
                 {search: search}
                 ),
             config.getconfig())
@@ -54,7 +54,7 @@ async function insert(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/time`, config.postdataconfig(data))
+        let response = await fetch(`${config.endpoint}/semester`, config.postdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -73,7 +73,7 @@ async function del(id, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/time`, config.deletedataconfig({id: id}))
+        let response = await fetch(`${config.endpoint}/semester`, config.deletedataconfig({id: id}))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -92,7 +92,7 @@ async function update(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/time`, config.putdataconfig(data))
+        let response = await fetch(`${config.endpoint}/semester`, config.putdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -105,27 +105,10 @@ async function update(data, callback){
     callback(result)
 }
 
-function upload(data, callback){
-    let result = {
-        json: null,
-        err: null
-    }
-    fetch(`${config.endpoint}`, config.putconfig).then(res=>{
-        return res.json();
-    }).then(json=>{
-        result.json = json;
-        callback(result);
-    }).catch(err=>{
-        result.err = err;
-        callback(result);
-    });
-}
-
-export const time = {
+export const semester = {
     list,
     insert,
     del,
     update,
-    upload,
     lightsrc
 }

@@ -215,7 +215,8 @@
       },
       OkButton(){
         const {dispatch} = this.$store;
-        dispatch('students/deleteStudent', {id: this.idselected.teacher_id})
+        dispatch('students/deleteStudent', {id: this.table[this.idselected].student_id})
+        dispatch('students/deleteItems', {id: this.idselected})
         this.alert = false
         this.idselected = 0
       },
@@ -235,6 +236,9 @@
         if(this.editedIndex == -1){
           formData.append('id', this.idselected)
         }
+        if(this.forminput.imageFile == null){
+          return;
+        }
         formData.append('imgusr', this.forminput.imageFile)
         formData.append('name', this.forminput.name)
         formData.append('nis', this.forminput.nis)
@@ -246,7 +250,7 @@
         formData.append('motherName', this.forminput.mothername)
         formData.append('address', this.forminput.address)
         formData.append('phoneNumber', this.forminput.phonenumber)
-        formData.append('classid', this.forminput.class.id)
+        formData.append('classid', this.forminput.class)
         const {dispatch} = this.$store;
         if(this.editedIndex == -1){
           dispatch('students/updateStudent', {data: formData})

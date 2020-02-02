@@ -14,7 +14,7 @@
             </v-card-title>
 
             <v-card-text>
-                <FormDepartment :forminput="forminput"/>
+                <FormDay :forminput="forminput"/>
             </v-card-text>
 
             <v-card-actions>
@@ -41,7 +41,7 @@
             </v-btn>
         </v-fab-transition>
         <v-card-title>
-        Table Jurusan
+        Table Hari
         <v-spacer></v-spacer>
         <v-text-field
             v-model="search"
@@ -98,7 +98,7 @@
 <script>
     export default {
         components: {
-            FormDepartment: () => import('@/components/FormDepartment'),
+            FormDay: () => import('@/components/FormDay'),
             Dialog: () => import('@/components/Dialog'),
         },
         data () {
@@ -109,16 +109,15 @@
                 timeout: 6000,
                 alert: false,
                 forminput: {
-                departmentname: "",
-                departmentid: ""
+                    dayname: "",
+                    dayid: ""
                 },
-                imageUrl: "",
                 total: 0,
                 selected: [],
                 sortbylast: null,
                 search: "",
                 loading: false,
-                formTitle: 'Input Guru',
+                formTitle: 'Input Hari',
                 hidden: false,
                 options: {},
                 dialog: false,
@@ -126,7 +125,7 @@
                 idselected: 0,
                 sortingDesc: "ASC",
                 theaders: [
-                    {text: 'Nama Jurusan', value: 'department_name'},
+                    {text: 'Semester', value: 'semester_name'},
                     {text: 'Actions', value: 'action', sortable: false }
                 ],
                 currentY: 0,
@@ -145,30 +144,29 @@
         },
         removeError(){
             const {dispatch} = this.$store;
-            dispatch('departments/removeError')
+            dispatch('semesters/removeError')
         },
         editItem (item) {
-            const {department_name, department_id} = item
+            const {day_name, day_id} = item
             this.editedIndex = -1
             this.forminput = {
-                departmentname: department_name,
-                departmentid: department_id,
+                dayname: day_name,
+                dayid: day_id,
             }
             this.idselected = item
-            this.formTitle = 'Edit Jurusan'
+            this.formTitle = 'Edit Hari'
             const {dispatch} = this.$store;
-            dispatch('departments/openDialog')
+            dispatch('semesters/openDialog')
         },
         addItem(){
             this.forminput = {
-            studyname: "",
-            studycode: "",
+                dayname: "",
+                dayid: ""
             }
-            this.imageUrl = ''
             this.editedIndex = 1
-            this.formTitle = 'Tambah Jurusan'
+            this.formTitle = 'Tambah Hari'
             const {dispatch} = this.$store;
-            dispatch('departments/openDialog')
+            dispatch('semesters/openDialog')
         },
         deleteItem (item) {
             const index = this.table.indexOf(item)
@@ -177,8 +175,8 @@
         },
         OkButton(){
             const {dispatch} = this.$store;
-            dispatch('departments/deleteDepartment', {id: this.table[this.idselected].department_id})
-            dispatch('departments/deleteItems', {id: this.idselected})
+            dispatch('semesters/deleteSemester', {id: this.table[this.idselected].semester_id})
+            dispatch('semesters/deleteItems', {id: this.idselected})
             this.alert = false
             this.idselected = 0
         },
@@ -190,22 +188,20 @@
         },
         closeDialog(){
             const {dispatch} = this.$store;
-            dispatch('departments/closeDialog')
+            dispatch('semesters/closeDialog')
         },
         save () {
             if(this.$refs.form.$refs.form.validate()){
                 if(this.isLoading) return;
                 let data = {};
                 if(this.editedIndex == -1){
-                    data.id = this.idselected.study_id
+                    data.id = this.idselected.day_id
                 }
-                data.studyname = this.forminput.studyname
-                data.studycode = this.forminput.studycode
+                data.dayname = this.forminput.dayname
+                data.dayid = this.forminput.dayid
                 const {dispatch} = this.$store;
                 if(this.editedIndex == -1){
-                    dispatch('departments/updateDepartments', {data: data})
-                }else{
-                    dispatch('departments/uploadStudy', {data: data})
+                    dispatch('semesters/updatesemesters', {data: data})
                 }
             }
             // this.close()
@@ -219,24 +215,24 @@
             if(sortDesc.length === 1){
                 this.sortingDesc = !sortDesc[0] ? "ASC" : "DESC"
             }
-            dispatch('departments/storeReq', {index: page, rows: itemsPerPage, search: this.search, sortby: this.sortbylast, sort: this.sortingDesc})
+            dispatch('semesters/storeReq', {index: page, rows: itemsPerPage, search: this.search, sortby: this.sortbylast, sort: this.sortingDesc})
         }
         },
         computed: {
         table(){
-            return this.$store.getters['departments/getAllItems']
+            return this.$store.getters['semesters/getAllItems']
         },
         isLoading(){
-            return this.$store.getters['departments/getLoading']
+            return this.$store.getters['semesters/getLoading']
         },
         lentable(){
-            return this.$store.getters['departments/getLenItems']
+            return this.$store.getters['semesters/getLenItems']
         },
         isUpload(){
-            return this.$store.getters['departments/getStatUpload']
+            return this.$store.getters['semesters/getStatUpload']
         },
         errorMsg(){
-            return this.$store.getters['departments/getError']
+            return this.$store.getters['semesters/getError']
         },
         params(){
             return {
@@ -245,7 +241,7 @@
             }
         },
         dialogActive(){
-            return this.$store.getters['departments/getDialog']
+            return this.$store.getters['semesters/getDialog']
         }
         },
         watch: {

@@ -9,6 +9,7 @@
         ref="image"
         accept="image/*"
         @change="onFilePicked"
+        required
       >
     </v-flex>
     <v-text-field
@@ -99,16 +100,20 @@
       v-on:keypress="isNumber"
       required
     ></v-text-field>
-    <v-select
-      v-model="forminput.class"
-      :items="classselect"
-      item-text="name"
-      item-value="id"
-      label="Kelas"
-      persistent-hint
-      return-object
-      single-line
-    ></v-select>
+    <v-autocomplete
+    v-model="forminput.class"
+    :loading="loading_class"
+    :items="itemsClass"
+    :search-input.sync="search_class"
+    item-text="value"
+    item-value="id"
+    cache-items
+    class="mx-3"
+    text
+    hide-no-data
+    hide-details
+    label="Kelas"
+    ></v-autocomplete>
   </v-form>
 </template>
 <script>
@@ -123,7 +128,10 @@
       genderlist: ['Lelaki', 'Perempuan'],
       religionlist: ['Islam', 'Kristen Protestan', 'Katolik', 'Buddha', 'Hindu', 'Kong Hu Cu'],
       dialog: false,
-      imageName: ''
+      imageName: '',
+      select_class: [],
+      loading_class: false,
+      search_class: "",
     }),
     methods: {
       isNumber: function(evt) {
@@ -135,11 +143,15 @@
               return true;
           }
       },
+      searchClass(v){
+        const {dispatch} = this.$store
+        dispatch('classdata/searchLight', v)
+      },
       save (date) {
         this.$refs.menu.save(date)
       },
       pickFile () {
-            this.$refs.image.click ()
+        this.$refs.image.click ()
       },
       onFilePicked (e) {
         const files = e.target.files
@@ -165,14 +177,17 @@
       classselect () {
         return this.$store.getters['students/getClassList']
       },
-      selected(){
-        return this.classselect[this.forminput.class]
+      itemsClass(){
+        return this.$store.getters['classdata/getLightResult']
       }
     },
     watch: {
       menu (val) {
         val && setTimeout(() => (this.$refs.picker.activePicker = 'YEAR'))
       },
+      search_class(val){
+        val && val !== this.select_class && this.searchClass(val)
+      }
     },
   }
 </script>

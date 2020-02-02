@@ -75,7 +75,7 @@
     text
     hide-no-data
     hide-details
-    label="Kelas"
+    label="Jam Pelajaran"
     ></v-autocomplete>
   </v-form>
 </template>
@@ -99,7 +99,7 @@
         search_class: "",
         select_time: [],
         loading_time: false,
-        search_time: false,
+        search_time: "",
         type_select: ['KBM', 'EXAM'],
         valid: false,
         menu: false,
@@ -117,6 +117,14 @@
         searchTime(v){
           const {dispatch} = this.$store
           dispatch('times/searchLight', v)
+        },
+        searchClass(v){
+          const {dispatch} = this.$store
+          dispatch('classdata/searchLight', v)
+        },
+        searchDay(v){
+          const {dispatch} = this.$store
+          dispatch('days/searchLight', v)
         }
     },
     watch: {
@@ -127,10 +135,13 @@
             val && val !== this.select_study && this.searchStudy(val)
         },
         search_time(val){
-          val && val !== this.select_time && this.search_time(val)
+          val && val !== this.select_time && this.searchTime(val)
         },
         search_class(val){
-          val && val !== this.select_class && this.search_class(val)
+          val && val !== this.select_class && this.searchClass(val)
+        },
+        search_day(val){
+          val && val !== this.select_day && this.searchDay(val)
         }
     },
     computed: {
@@ -142,6 +153,9 @@
         },
         itemsTime(){
           return this.$store.getters['times/getLightResult']
+        },
+        itemsDay(){
+          return this.$store.getters['days/getLightResult']
         },
         itemsClass(){
           return this.$store.getters['classdata/getLightResult']
@@ -155,7 +169,7 @@
         searchTimeLength(){
           return this.search_time.length;
         },
-        seacrhClassLength(){
+        searchClassLength(){
           return this.search_class.length;
         }
     },

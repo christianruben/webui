@@ -8,7 +8,7 @@ async function list({index, rows, search, sortby, sort}, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/time`, 
+                `${config.endpoint}/department`, 
                 {page: index, search: search, sortby: sortby, sort: sort, rows: rows}
                 ),
             config.getconfig())
@@ -32,7 +32,7 @@ async function lightsrc(search, callback){
     try{
         let response = await fetch(
             config.getUrlParams(
-                `${config.endpoint}/time/light`, 
+                `${config.endpoint}/department/light`, 
                 {search: search}
                 ),
             config.getconfig())
@@ -54,7 +54,7 @@ async function insert(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/time`, config.postdataconfig(data))
+        let response = await fetch(`${config.endpoint}/department`, config.postdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -73,7 +73,7 @@ async function del(id, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/time`, config.deletedataconfig({id: id}))
+        let response = await fetch(`${config.endpoint}/department`, config.deletedataconfig({id: id}))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -92,7 +92,7 @@ async function update(data, callback){
         err: null
     }
     try{
-        let response = await fetch(`${config.endpoint}/time`, config.putdataconfig(data))
+        let response = await fetch(`${config.endpoint}/department`, config.putdataconfig(data))
         let json = await response.json()
         if(response.status == 200){
             result.json = json.data
@@ -121,7 +121,7 @@ function upload(data, callback){
     });
 }
 
-export const time = {
+export const department = {
     list,
     insert,
     del,
